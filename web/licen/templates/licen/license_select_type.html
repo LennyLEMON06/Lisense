@@ -1,18 +1,185 @@
 <!-- licen/templates/licen/license_select_type.html -->
-
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Выберите тип лицензии</h2>
-    <ul class="list-group">
-        <li class="list-group-item"><a href="{% url 'fiscal-number-create-one' %}">Фискальный номер</a></li>
-        <li class="list-group-item"><a href="{% url 'crypto-pro-create' %}">CryptoPro</a></li>
-        <li class="list-group-item"><a href="{% url 'ecp-create' %}">ЭЦП</a></li>
-        <li class="list-group-item"><a href="{% url 'utmr-sakeys-create' %}">УТМ RSA ключи</a></li>
-        <li class="list-group-item"><a href="{% url 'mcd-create' %}">МЧД</a></li>
-        <li class="list-group-item"><a href="{% url 'honest-sign-create' %}">Честный знак</a></li>
-        <li class="list-group-item"><a href="{% url 'usais-create' %}">ЕГАИС</a></li>
-        <li class="list-group-item"><a href="{% url 'ofd-create' %}">ОФД</a></li>
-    </ul>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pb-0">
+                    <div class="text-center">
+                        <h2 class="h3 mb-1 fw-bold text-primary">
+                            <i class="ri-key-2-line me-2"></i>Добавить новую лицензию
+                        </h2>
+                        <p class="text-muted">Выберите тип лицензии для добавления</p>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Фискальный номер -->
+                        <div class="col-md-6">
+                            <a href="{% url 'fiscal-number-create-one' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-purple-light text-purple mb-3 mx-auto">
+                                        <i class="ri-barcode-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">Фискальный номер</h5>
+                                    <p class="text-muted small mb-0">Регистрация в налоговой</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- CryptoPro -->
+                        <div class="col-md-6">
+                            <a href="{% url 'crypto-pro-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-blue-light text-blue mb-3 mx-auto">
+                                        <i class="ri-lock-2-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">CryptoPro</h5>
+                                    <p class="text-muted small mb-0">Криптографическая защита</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- ЭЦП -->
+                        <div class="col-md-6">
+                            <a href="{% url 'ecp-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-orange-light text-orange mb-3 mx-auto">
+                                        <i class="ri-signature-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">ЭЦП</h5>
+                                    <p class="text-muted small mb-0">Электронная цифровая подпись</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- УТМ RSA ключи -->
+                        <div class="col-md-6">
+                            <a href="{% url 'utmr-sakeys-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-green-light text-green mb-3 mx-auto">
+                                        <i class="ri-key-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">УТМ RSA ключи</h5>
+                                    <p class="text-muted small mb-0">Ключи для УТМ</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- МЧД -->
+                        <div class="col-md-6">
+                            <a href="{% url 'mcd-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-red-light text-red mb-3 mx-auto">
+                                        <i class="ri-file-text-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">МЧД</h5>
+                                    <p class="text-muted small mb-0">Маркировка товаров</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- Честный знак -->
+                        <div class="col-md-6">
+                            <a href="{% url 'honest-sign-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-teal-light text-teal mb-3 mx-auto">
+                                        <i class="ri-checkbox-circle-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">Честный знак</h5>
+                                    <p class="text-muted small mb-0">Система маркировки</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- ЕГАИС -->
+                        <div class="col-md-6">
+                            <a href="{% url 'usais-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-indigo-light text-indigo mb-3 mx-auto">
+                                        <i class="ri-water-flash-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">ЕГАИС</h5>
+                                    <p class="text-muted small mb-0">Учёт алкогольной продукции</p>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- ОФД -->
+                        <div class="col-md-6">
+                            <a href="{% url 'ofd-create' %}" class="card license-type-card h-100 text-decoration-none">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-circle bg-pink-light text-pink mb-3 mx-auto">
+                                        <i class="ri-cloud-line fs-3"></i>
+                                    </div>
+                                    <h5 class="mb-1">ОФД</h5>
+                                    <p class="text-muted small mb-0">Оператор фискальных данных</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white border-0 text-center pt-0">
+                    <a href="{% url 'license-list' %}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line me-1"></i> Вернуться к списку
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .license-type-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .license-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 123, 255, 0.3);
+    }
+    
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Цветовые схемы */
+    .bg-purple-light { background-color: rgba(111, 66, 193, 0.1); }
+    .text-purple { color: #6f42c1; }
+    
+    .bg-blue-light { background-color: rgba(13, 110, 253, 0.1); }
+    .text-blue { color: #0d6efd; }
+    
+    .bg-orange-light { background-color: rgba(253, 126, 20, 0.1); }
+    .text-orange { color: #fd7e14; }
+    
+    .bg-green-light { background-color: rgba(25, 135, 84, 0.1); }
+    .text-green { color: #198754; }
+    
+    .bg-red-light { background-color: rgba(220, 53, 69, 0.1); }
+    .text-red { color: #dc3545; }
+    
+    .bg-teal-light { background-color: rgba(32, 201, 151, 0.1); }
+    .text-teal { color: #20c997; }
+    
+    .bg-indigo-light { background-color: rgba(102, 16, 242, 0.1); }
+    .text-indigo { color: #6610f2; }
+    
+    .bg-pink-light { background-color: rgba(214, 51, 132, 0.1); }
+    .text-pink { color: #d63384; }
+</style>
 {% endblock %}
