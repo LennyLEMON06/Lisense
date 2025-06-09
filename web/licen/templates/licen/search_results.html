@@ -1,0 +1,37 @@
+<!-- licen/templates/licen/search_results.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Результаты поиска</h2>
+
+    {% if not query %}
+    <div class="alert alert-info">Введите запрос в строке поиска.</div>
+    {% else %}
+    {% if results %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Тип</th>
+                <th>Название</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.type }}</td>
+                <td><a href="{{ result.url }}">{{ result.name }}</a></td>
+                <td><a href="{{ result.url }}" class="btn btn-sm btn-info">Просмотр</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">Ничего не найдено.</div>
+    {% endif %}
+    {% endif %}
+
+    <a href="#" onclick="window.history.back()" class="btn btn-secondary">← Назад</a>
+</div>
+{% endblock %}

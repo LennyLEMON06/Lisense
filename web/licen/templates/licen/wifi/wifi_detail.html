@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/wifi_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали WiFi сети</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ wifi.id }}</dd>
+
+        <dt class="col-sm-3">SSID:</dt>
+        <dd class="col-sm-9">{{ wifi.name }}</dd>
+
+        <dt class="col-sm-3">Пароль:</dt>
+        <dd class="col-sm-9">{{ wifi.password }}</dd>
+
+        <dt class="col-sm-3">Диапазон частот:</dt>
+        <dd class="col-sm-9">{{ wifi.get_frequency_band_display }}</dd>
+
+        <dt class="col-sm-3">Адрес:</dt>
+        <dd class="col-sm-9"><a href="#">{{ wifi.address.address }} ({{ wifi.address.network }})</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ wifi.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'wifi-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

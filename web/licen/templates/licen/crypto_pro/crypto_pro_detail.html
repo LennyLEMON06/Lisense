@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/crypto_pro_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии CryptoPro</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ crypto_pro.id }}</dd>
+
+        <dt class="col-sm-3">Ключ:</dt>
+        <dd class="col-sm-9">{{ crypto_pro.key }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ crypto_pro.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ crypto_pro.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ crypto_pro.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ crypto_pro.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'crypto-pro-update' crypto_pro.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'crypto-pro-delete' crypto_pro.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'crypto-pro-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

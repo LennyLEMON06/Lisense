@@ -1,0 +1,44 @@
+<!-- licen/templates/licen/contact_person/list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Почты сотрудников</h2>
+        <a href="{% url 'contact-person-create' %}" class="btn btn-success">+ Добавить</a>
+    </div>
+
+    {% if persons %}
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ФИО</th>
+                <th>Город</th>
+                <th>Должность</th>
+                <th>Email</th>
+                <th>Пароль</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in persons %}
+            <tr>
+                <td>{{ person.full_name }}</td>
+                <td><a href="{% url 'city-detail' person.city.id %}">{{ person.city.name }}</a></td>
+                <td>{{ person.position }}</td>
+                <td>{{ person.email }}</td>
+                <td>{{ person.email_password }}</td>
+                <td class="text-nowrap">
+                    <a href="{% url 'contact-person-detail' person.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
+                    <a href="{% url 'contact-person-update' person.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'contact-person-delete' person.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info">Нет почт сотрудников</p>
+    {% endif %}
+</div>
+{% endblock %}

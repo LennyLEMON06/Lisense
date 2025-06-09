@@ -1,0 +1,74 @@
+<!-- licen/templates/licen/computer_list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Список компьютеров</h2>
+        <a href="{% url 'computer-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i> Добавить компьютер
+        </a>
+    </div>
+
+    {% if computers %}
+    <!-- Таблица для десктопа -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>IP-адрес</th>
+                    <th>Адрес</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for computer in computers %}
+                <tr>
+                    <td>{{ computer.id }}</td>
+                    <td><a href="{% url 'computer-detail' computer.id %}">{{ computer.name }}</a></td>
+                    <td>{{ computer.ipv4_address|default:"—" }}</td>
+                    <td>{{ computer.address|default:"—" }}</td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Карточки для мобильных устройств -->
+    <div class="row row-cols-1 g-4 d-md-none">
+        {% for computer in computers %}
+        <div class="col">
+            <div class="card shadow-sm border h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">#{{ computer.id }}</h5>
+                    <p class="card-text mb-2">
+                        <strong>Имя:</strong> {{ computer.name|truncatechars:30 }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>IP-адрес:</strong> {{ computer.ipv4_address|default:"—" }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Адрес:</strong> {{ computer.address|default:"—" }}
+                    </p>
+                    <div class="d-flex justify-content-start gap-2 mt-3">
+                        <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">Нет компьютеров в базе</div>
+    {% endif %}
+</div>
+{% endblock %}

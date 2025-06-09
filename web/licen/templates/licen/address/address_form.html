@@ -1,0 +1,32 @@
+<!-- licen/templates/licen/address_form.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">{{ title }}</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form }}
+                        <div class="d-flex flex-column flex-md-row gap-2 pt-3">
+                            <button type="submit" class="btn btn-success flex-grow-1">Сохранить</button>
+                            {% if network %}
+                                <a href="{% url 'network-detail' network.id %}" class="btn btn-secondary flex-grow-1">Отмена</a>
+                            {% else %}
+                                <a href="{% url 'address-list' %}" class="btn btn-secondary flex-grow-1">Отмена</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

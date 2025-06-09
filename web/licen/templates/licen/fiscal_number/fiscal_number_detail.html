@@ -1,0 +1,34 @@
+<!-- licen/templates/licen/fiscal_number_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали фискального номера</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ fiscal_number.id }}</dd>
+
+        <dt class="col-sm-3">Модель:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.model }}</dd>
+
+        <dt class="col-sm-3">ЗН:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.zn }}</dd>
+
+        <dt class="col-sm-3">Рег. номер:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.reg_number }}</dd>
+
+        <dt class="col-sm-3">ФН:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.fn }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ fiscal_number.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'fiscal-number-update-one' fiscal_number.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'fiscal-number-delete-one' fiscal_number.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'fiscal-number-list-one' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

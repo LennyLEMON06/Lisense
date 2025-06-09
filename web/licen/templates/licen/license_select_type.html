@@ -1,0 +1,18 @@
+<!-- licen/templates/licen/license_select_type.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Выберите тип лицензии</h2>
+    <ul class="list-group">
+        <li class="list-group-item"><a href="{% url 'fiscal-number-create-one' %}">Фискальный номер</a></li>
+        <li class="list-group-item"><a href="{% url 'crypto-pro-create' %}">CryptoPro</a></li>
+        <li class="list-group-item"><a href="{% url 'ecp-create' %}">ЭЦП</a></li>
+        <li class="list-group-item"><a href="{% url 'utmr-sakeys-create' %}">УТМ RSA ключи</a></li>
+        <li class="list-group-item"><a href="{% url 'mcd-create' %}">МЧД</a></li>
+        <li class="list-group-item"><a href="{% url 'honest-sign-create' %}">Честный знак</a></li>
+        <li class="list-group-item"><a href="{% url 'usais-create' %}">ЕГАИС</a></li>
+        <li class="list-group-item"><a href="{% url 'ofd-create' %}">ОФД</a></li>
+    </ul>
+</div>
+{% endblock %}

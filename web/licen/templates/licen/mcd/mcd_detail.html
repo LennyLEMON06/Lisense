@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/mcd_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии МЧД</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ mcd.id }}</dd>
+
+        <dt class="col-sm-3">Идентификатор:</dt>
+        <dd class="col-sm-9">{{ mcd.mcd_id }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ mcd.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ mcd.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ mcd.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ mcd.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'mcd-update' mcd.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'mcd-delete' mcd.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'mcd-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

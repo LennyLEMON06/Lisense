@@ -1,0 +1,18 @@
+<!-- licen/templates/licen/network_form.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        {% if legal_entity %}
+            <a href="{% url 'legal-entity-detail' legal_entity.id %}" class="btn btn-secondary">Отмена</a>
+        {% else %}
+            <a href="{% url 'network-list' %}" class="btn btn-secondary">Отмена</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/address_confirm_delete.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3 class="h5 mb-0">Подтверждение удаления</h3>
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4>Вы уверены, что хотите удалить "{{ object }}"?</h4>
+
+                    <p class="text-muted mt-3">Это действие нельзя отменить. Все связанные данные (компьютеры, лицензии, кабинеты) также будут удалены.</p>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg px-4 py-2">
+                            Да, удалить
+                        </button>
+                        <a href="{% url 'address-list' %}" class="btn btn-outline-secondary btn-lg ms-2 px-4 py-2 d-block d-md-inline-block mt-3 mt-md-0">
+                            Отмена
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

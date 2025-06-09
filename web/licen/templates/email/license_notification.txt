@@ -1,0 +1,8 @@
+Уведомление о лицензии: {{ license.name }}
+
+Тип уведомления: {{ notification_type }}
+Адрес: {{ license.address }}
+Дата окончания: {{ license.end_date }}
+Осталось дней: {{ days_left }}
+
+Комментарии: {{ license.comments|default:"-" }}

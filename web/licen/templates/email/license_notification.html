@@ -1,0 +1,79 @@
+<!-- licen/templates/email/license_notification.html -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Уведомление о лицензии</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .header {
+            color: #d9534f;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .content {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #0275d6;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a.button:hover {
+            background-color: #025a9c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">⚠️ Лицензия скоро истекает</div>
+
+    <div class="content">
+        Уважаемый(ая) {{ user.username }},
+        <br><br>
+        Лицензия типа <strong>{{ license_type }}</strong> (ID: {{ license_id }}) скоро истекает.
+        <br><br>
+        <strong>Дата окончания:</strong> {{ expiration_date }}
+        <br>
+        <strong>Осталось дней:</strong> {{ days_left }}
+        <br><br>
+        Подробнее: 
+        <a href="{{ admin_url }}" target="_blank" class="button">Посмотреть в админке</a>
+    </div>
+
+    <div class="footer">
+        Это автоматическое уведомление. Пожалуйста, не отвечайте на него.<br>
+        С уважением,<br>
+        Система управления лицензиями
+    </div>
+</div>
+
+</body>
+</html>

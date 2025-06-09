@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/remote_access_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали удаленного доступа</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ access.id }}</dd>
+
+        <dt class="col-sm-3">Тип доступа:</dt>
+        <dd class="col-sm-9">{{ access.get_name_display }}</dd>
+
+        <dt class="col-sm-3">ID доступа:</dt>
+        <dd class="col-sm-9">{{ access.access_id }}</dd>
+
+        <dt class="col-sm-3">Пароль:</dt>
+        <dd class="col-sm-9">{{ access.password }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ access.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ access.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'remote-access-update' access.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'remote-access-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

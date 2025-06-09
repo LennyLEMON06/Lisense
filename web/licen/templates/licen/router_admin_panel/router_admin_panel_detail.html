@@ -1,0 +1,34 @@
+<!-- licen/templates/licen/router_admin_panel_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали панели роутера</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ panel.id }}</dd>
+
+        <dt class="col-sm-3">Имя:</dt>
+        <dd class="col-sm-9">{{ panel.name }}</dd>
+
+        <dt class="col-sm-3">Логин:</dt>
+        <dd class="col-sm-9">{{ panel.login }}</dd>
+
+        <dt class="col-sm-3">Пароль:</dt>
+        <dd class="col-sm-9">{{ panel.password }}</dd>
+
+        <dt class="col-sm-3">IP-адрес:</dt>
+        <dd class="col-sm-9">{{ panel.ip_address }}</dd>
+
+        <dt class="col-sm-3">Адрес:</dt>
+        <dd class="col-sm-9"><a href="#">{{ panel.address.address }} ({{ panel.address.network }})</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ panel.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'router-admin-panel-update' panel.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'router-admin-panel-delete' panel.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'router-admin-panel-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

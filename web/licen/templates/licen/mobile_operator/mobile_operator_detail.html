@@ -1,0 +1,34 @@
+<!-- licen/templates/licen/mobile_operator_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали мобильного оператора</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ operator.id }}</dd>
+
+        <dt class="col-sm-3">Оператор:</dt>
+        <dd class="col-sm-9">{{ operator.operator.name }}</dd>
+
+        <dt class="col-sm-3">Номер телефона:</dt>
+        <dd class="col-sm-9">{{ operator.phone_number }}</dd>
+
+        <dt class="col-sm-3">ФИО сотрудника:</dt>
+        <dd class="col-sm-9">{{ operator.employee_name }}</dd>
+
+        <dt class="col-sm-3">Договор:</dt>
+        <dd class="col-sm-9">{{ operator.contract }}</dd>
+
+        <dt class="col-sm-3">Адрес:</dt>
+        <dd class="col-sm-9"><a href="#">{{ operator.address }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ operator.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'mobile-operator-update' operator.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'mobile-operator-delete' operator.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'mobile-operator-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

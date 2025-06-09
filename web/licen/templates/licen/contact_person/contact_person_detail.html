@@ -1,0 +1,35 @@
+<!-- licen/templates/licen/contact_person/detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали почты</h2>
+    <dl class="row g-3">
+        <dt class="col-sm-3">Город:</dt>
+        <dd class="col-sm-9">
+            <a href="{% url 'city-detail' person.city.id %}">{{ person.city.name }}</a>
+        </dd>
+
+        <dt class="col-sm-3">ФИО:</dt>
+        <dd class="col-sm-9">{{ person.full_name }}</dd>
+
+        <dt class="col-sm-3">Должность:</dt>
+        <dd class="col-sm-9">{{ person.position }}</dd>
+
+        <dt class="col-sm-3">Номер телефона:</dt>
+        <dd class="col-sm-9">{{ person.phone_number }}</dd>
+
+        <dt class="col-sm-3">Email:</dt>
+        <dd class="col-sm-9">{{ person.email }}</dd>
+
+        <dt class="col-sm-3">Пароль:</dt>
+        <dd class="col-sm-9">{{ person.email_password }}</dd>
+    </dl>
+
+    <div class="mt-4">
+        <a href="{% url 'contact-person-update' person.id %}" class="btn btn-warning me-2">Редактировать</a>
+        <a href="{% url 'contact-person-delete' person.id %}" class="btn btn-danger me-2">Удалить</a>
+        <a href="{% url 'contact-person-list' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}

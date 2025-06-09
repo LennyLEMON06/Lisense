@@ -1,0 +1,89 @@
+<!-- licen/templates/licen/crypto_pro/crypto_pro_list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Список лицензий CryptoPro</h2>
+        <a href="{% url 'crypto-pro-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i> Добавить лицензию
+        </a>
+    </div>
+
+    {% if crypto_pros %}
+    <!-- Таблица для десктопа -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Ключ</th>
+                    <th>Дата окончания</th>
+                    <th>Осталось дней</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in crypto_pros %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td><a href="{% url 'crypto-pro-detail' item.id %}">{{ item.key|truncatechars:20 }}</a></td>
+                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                    <td>
+                        {% with days_left=item.days_left %}
+                            {% if days_left <= 0 %}
+                                <span class="text-danger">Лицензия истекла</span>
+                            {% else %}
+                                {{ days_left }} дн.
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'crypto-pro-delete' item.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Карточки для мобильных устройств -->
+    <div class="row row-cols-1 g-4 d-md-none">
+        {% for item in crypto_pros %}
+        <div class="col">
+            <div class="card shadow-sm border h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">#{{ item.id }}</h5>
+                    <p class="card-text mb-2">
+                        <strong>Ключ:</strong> {{ item.key|truncatechars:30 }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Осталось дней:</strong>
+                        {% with days_left=item.days_left %}
+                            {% if days_left <= 0 %}
+                                <span class="text-danger">Лицензия истекла</span>
+                            {% else %}
+                                {{ days_left }} дн.
+                            {% endif %}
+                        {% endwith %}
+                    </p>
+                    <div class="d-flex justify-content-start gap-2 mt-3">
+                        <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'crypto-pro-delete' item.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">Нет лицензий CryptoPro в базе</div>
+    {% endif %}
+</div>
+{% endblock %}

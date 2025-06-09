@@ -1,0 +1,13 @@
+Здравствуйте, {{ user.first_name }}!
+
+{% if notification.notification_type == 'expiring_soon' %}
+Лицензия {{ notification.license_type }} для компьютера {{ notification.computer.name }} истекает {{ notification.expiration_date|date:"d.m.Y" }}.
+{% else %}
+Лицензия {{ notification.license_type }} для компьютера {{ notification.computer.name }} уже истекла {{ notification.expiration_date|date:"d.m.Y" }}!
+{% endif %}
+
+Адрес: {{ notification.computer.address }}
+Комментарии: {{ notification.comments|default:"Нет комментариев" }}
+
+С уважением,
+Система мониторинга лицензий

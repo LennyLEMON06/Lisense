@@ -1,0 +1,18 @@
+<!-- licen/templates/licen/personal_account_mobile_operator_form.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        {% if address %}
+            <a href="{% url 'address-detail' address.id %}" class="btn btn-secondary">Отмена</a>
+        {% else %}
+            <a href="{% url 'personal-account-mobile-operator-list' %}" class="btn btn-secondary">Отмена</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

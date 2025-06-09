@@ -1,0 +1,283 @@
+<!-- licen/templates/licen/dashboard.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">Добро пожаловать в License Manager</h2>
+                            <p class="card-text opacity-75">Управляйте вашими лицензиями и отслеживайте сроки действия</p>
+                        </div>
+                        <img src="{% static 'images/license-icon.svg' %}" alt="License Icon" height="80" class="d-none d-md-block">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Быстрые действия -->
+        <div class="col-xxl-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 fw-bold text-primary">Быстрые действия</h5>
+                    <i class="ri-rocket-2-line fs-5 text-muted"></i>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6 col-xxl-12">
+                            <a href="{% url 'license-select-type' %}" class="card action-card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <div class="icon-circle bg-primary-light text-primary mb-3 mx-auto">
+                                        <i class="ri-file-add-line fs-3"></i>
+                                    </div>
+                                    <h6 class="mb-0">Добавить лицензию</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-xxl-12">
+                            <a href="{% url 'license-list' %}" class="card action-card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <div class="icon-circle bg-info-light text-info mb-3 mx-auto">
+                                        <i class="ri-notification-line fs-3"></i>
+                                    </div>
+                                    <h6 class="mb-0">Все уведомления</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-xxl-12">
+                            <a href="{% url 'computer-list' %}" class="card action-card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <div class="icon-circle bg-success-light text-success mb-3 mx-auto">
+                                        <i class="ri-computer-line fs-3"></i>
+                                    </div>
+                                    <h6 class="mb-0">Компьютеры</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-xxl-12">
+                            <a href="{% url 'network-list' %}" class="card action-card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <div class="icon-circle bg-warning-light text-warning mb-3 mx-auto">
+                                        <i class="ri-building-4-line fs-3"></i>
+                                    </div>
+                                    <h6 class="mb-0">Юрлица</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-xxl-12">
+                            <a href="{% url 'address-list' %}" class="card action-card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <div class="icon-circle bg-warning-light text-warning mb-3 mx-auto">
+                                        <i class="ri-building-4-line fs-3"></i>
+                                    </div>
+                                    <h6 class="mb-0">Адреса</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="col-xxl-8">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 fw-bold text-primary">Статистика лицензий</h5>
+                    <i class="ri-bar-chart-2-line fs-5 text-muted"></i>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card stat-card bg-primary-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted mb-1">Всего лицензий</h6>
+                                            <h3 class="mb-0">{{ total_licenses }}</h3>
+                                        </div>
+                                        <div class="icon-circle bg-primary text-white">
+                                            <i class="ri-key-2-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card stat-card bg-danger-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted mb-1">Истёкшие</h6>
+                                            <h3 class="mb-0 text-danger">{{ expired_count }}</h3>
+                                        </div>
+                                        <div class="icon-circle bg-danger text-white">
+                                            <i class="ri-time-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card stat-card bg-warning-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted mb-1">Истекают в течение 30 дней</h6>
+                                            <h3 class="mb-0 text-warning">{{ expiring_soon_30|length }}</h3>
+                                        </div>
+                                        <div class="icon-circle bg-warning text-white">
+                                            <i class="ri-alarm-warning-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card stat-card bg-info-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted mb-1">Истекают в течение 7 дней</h6>
+                                            <h3 class="mb-0 text-info">{{ expiring_soon_7|length }}</h3>
+                                        </div>
+                                        <div class="icon-circle bg-info text-white">
+                                            <i class="ri-alarm-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- График (заглушка, можно подключить Chart.js) -->
+                    <div class="mt-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">Статус лицензий</h6>
+                                <div class="chart-container" style="height: 200px;">
+                                    <canvas id="licenseChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Истекающие лицензии -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5 class="mb-3 fw-bold text-primary">Предстоящие истечения</h5>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-warning border-2 h-100">
+                <div class="card-header bg-warning-light border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">30 дней до истечения</h6>
+                    <span class="badge bg-warning rounded-pill">{{ expiring_soon_30|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% include "licen/_notifications_list.html" with notifications=expiring_soon_30 %}
+                </div>
+                <div class="card-footer bg-white border-0 text-center">
+                    <a href="{% url 'license-list' %}?filter=expiring_30" class="btn btn-sm btn-outline-warning">Показать все</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-success border-2 h-100">
+                <div class="card-header bg-success-light border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">7 дней до истечения</h6>
+                    <span class="badge bg-success rounded-pill">{{ expiring_soon_7|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% include "licen/_notifications_list.html" with notifications=expiring_soon_7 %}
+                </div>
+                <div class="card-footer bg-white border-0 text-center">
+                    <a href="{% url 'license-list' %}?filter=expiring_7" class="btn btn-sm btn-outline-success">Показать все</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-primary border-2 h-100">
+                <div class="card-header bg-primary-light border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">1 день до истечения</h6>
+                    <span class="badge bg-primary rounded-pill">{{ expiring_soon_1|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% include "licen/_notifications_list.html" with notifications=expiring_soon_1 %}
+                </div>
+                <div class="card-footer bg-white border-0 text-center">
+                    <a href="{% url 'license-list' %}?filter=expiring_1" class="btn btn-sm btn-outline-primary">Показать все</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Chart.js для визуализации данных -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('licenseChart').getContext('2d');
+        const licenseChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Активные', 'Истёкшие', 'Истекают через 30 дней', 'Истекают через 7 дней'],
+                datasets: [{
+                    data: [
+                        {{ total_licenses|default:0 }} - {{ expired_count|default:0 }} - {{ expiring_soon_30|length|default:0 }} - {{ expiring_soon_7|length|default:0 }},
+                        {{ expired_count|default:0 }},
+                        {{ expiring_soon_30|length|default:0 }},
+                        {{ expiring_soon_7|length|default:0 }}
+                    ],
+                    backgroundColor: [
+                        '#4e73df',
+                        '#e74a3b',
+                        '#f6c23e',
+                        '#36b9cc'
+                    ],
+                    hoverBackgroundColor: [
+                        '#2e59d9',
+                        '#be2617',
+                        '#dda20a',
+                        '#1696a7'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        padding: 15,
+                        displayColors: true,
+                        caretPadding: 10,
+                    },
+                },
+                cutout: '70%',
+            },
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/ofd_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии ОФД</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ ofd.id }}</dd>
+
+        <dt class="col-sm-3">Регистрационный номер:</dt>
+        <dd class="col-sm-9">{{ ofd.reg_number }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ ofd.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ ofd.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ ofd.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ ofd.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'ofd-update' ofd.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'ofd-delete' ofd.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'ofd-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

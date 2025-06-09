@@ -1,0 +1,39 @@
+<!-- licen/templates/licen/usais_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии ЕГАИС</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ license.id }}</dd>
+
+        <dt class="col-sm-3">Ключ:</dt>
+        <dd class="col-sm-9">{{ license.key }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ license.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ license.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ license.comments }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9">
+            {% if license.computer %}
+                <a href="{% url 'computer-detail' license.computer.id %}">
+                    {{ license.computer.name }}
+                </a>
+            {% else %}
+                —
+            {% endif %}
+        </dd>
+    </dl>
+
+    <a href="{% url 'usais-update' license.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'usais-delete' license.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'usais-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

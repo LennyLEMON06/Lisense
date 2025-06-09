@@ -1,0 +1,30 @@
+<!-- licen/templates/licen/user_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали пользователя</h2>
+    <dl class="row">
+        <dt class="col-sm-3">Имя пользователя:</dt>
+        <dd class="col-sm-9">{{ user.username }}</dd>
+
+        <dt class="col-sm-3">Email:</dt>
+        <dd class="col-sm-9">{{ user.email }}</dd>
+
+        <dt class="col-sm-3">Роль:</dt>
+        <dd class="col-sm-9">{{ profile.get_role_display }}</dd>
+
+        <dt class="col-sm-3">Телефон:</dt>
+        <dd class="col-sm-9">{{ profile.phone|default:"—" }}</dd>
+
+        <dt class="col-sm-3">Отдел:</dt>
+        <dd class="col-sm-9">{{ profile.department|default:"—" }}</dd>
+    </dl>
+
+    <div class="mt-4">
+        <a href="{% url 'user-update' user.id %}" class="btn btn-warning">Редактировать</a>
+        <a href="{% url 'user-delete' user.id %}" class="btn btn-danger">Удалить</a>
+        <a href="{% url 'profile' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}

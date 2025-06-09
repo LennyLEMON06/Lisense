@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/utmr_sakeys_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали УТМ RSA ключа</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ key.id }}</dd>
+
+        <dt class="col-sm-3">Ключ:</dt>
+        <dd class="col-sm-9">{{ key.key }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ key.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ key.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ key.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ key.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'utmr-sakeys-update' key.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'utmr-sakeys-delete' key.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'utmr-sakeys-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

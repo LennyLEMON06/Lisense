@@ -1,0 +1,74 @@
+<!-- licen/templates/licen/internet_provider_list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Список интернет-провайдеров</h2>
+        <a href="{% url 'internet-provider-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i> Добавить провайдера
+        </a>
+    </div>
+
+    {% if providers %}
+    <!-- Таблица для десктопа -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Провайдер</th>
+                    <th>Адрес</th>
+                    <th>Скорость</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in providers %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td><a href="{% url 'internet-provider-detail' item.id %}">{{ item.provider|truncatechars:30 }}</a></td>
+                    <td>{{ item.address|default:"—" }}</td>
+                    <td>{{ item.speed|default:"—" }}</td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'internet-provider-detail' item.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'internet-provider-update' item.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'internet-provider-delete' item.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Карточки для мобильных устройств -->
+    <div class="row row-cols-1 g-4 d-md-none">
+        {% for item in providers %}
+        <div class="col">
+            <div class="card shadow-sm border h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">#{{ item.id }}</h5>
+                    <p class="card-text mb-2">
+                        <strong>Провайдер:</strong> {{ item.provider|truncatechars:30 }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Адрес:</strong> {{ item.address|default:"—" }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Скорость:</strong> {{ item.speed|default:"—" }}
+                    </p>
+                    <div class="d-flex justify-content-start gap-2 mt-3">
+                        <a href="{% url 'internet-provider-detail' item.id %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'internet-provider-update' item.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'internet-provider-delete' item.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">Нет интернет-провайдеров в базе</div>
+    {% endif %}
+</div>
+{% endblock %}

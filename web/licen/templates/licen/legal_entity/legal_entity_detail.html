@@ -1,0 +1,90 @@
+<!-- licen/templates/licen/legal_entity_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали сети</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ legal_entity.id }}</dd>
+
+        <dt class="col-sm-3">Название:</dt>
+        <dd class="col-sm-9">{{ legal_entity.name }}</dd>
+
+        <dt class="col-sm-3">Город:</dt>
+        {% if city %}
+            <dd class="col-sm-9">
+                <a href="{% url 'city-detail' city.id %}">{{ city.name }}</a>
+            </dd>
+        {% else %}
+            <dd class="col-sm-9 text-muted">—</dd>
+        {% endif %}
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ legal_entity.comments|default:"—" }}</dd>
+    </dl>
+
+    <!-- Кнопка добавления юридического лица -->
+    <a href="{% url 'network-create-for-legal-entity' legal_entity.id %}" class="btn btn-success mb-4">+ Юридическое лицо</a>
+
+    <!-- Таблица сетей -->
+    {% if networks %}
+    <h4>Юридические лица в этой сети</h4>
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>ФИО</th>
+                    <th>ИНН</th>
+                    <th>Комментарии</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for network in networks %}
+                <tr>
+                    <td>{{ network.id }}</td>
+                    <td><a href="{% url 'network-detail' network.id %}">{{ network.name }}</a></td>
+                    <td>{{ network.inn }}</td>
+                    <td>{{ network.comments|truncatechars:50 }}</td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'network-detail' network.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'network-update' network.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'network-delete' network.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Карточки для мобильных устройств -->
+    <div class="d-md-none">
+        {% for network in networks %}
+        <div class="card shadow-sm border mb-3">
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ network.id }}</p>
+                <p><strong>Название:</strong> <a href="{% url 'network-detail' network.id %}">{{ network.name }}</a></p>
+                <p><strong>ИНН:</strong> {{ network.inn }}</p>
+                <p><strong>Комментарии:</strong> {{ network.comments|truncatechars:50 }}</p>
+                <td class="text-nowrap">
+                        <a href="{% url 'network-detail' network.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'network-update' network.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'network-delete' network.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">Нет юридических лиц в этой сети.</p>
+    {% endif %}
+
+    <!-- Кнопки управления -->
+    <div class="mt-4">
+        <a href="{% url 'legal-entity-update' legal_entity.id %}" class="btn btn-warning">Редактировать</a>
+        <a href="{% url 'legal-entity-delete' legal_entity.id %}" class="btn btn-danger">Удалить</a>
+        <a href="{% url 'legal-entity-list' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}

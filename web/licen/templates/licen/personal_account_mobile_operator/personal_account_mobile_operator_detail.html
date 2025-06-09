@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/personal_account_mobile_operator_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали личного кабинета мобильного оператора</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ account.id }}</dd>
+
+        <dt class="col-sm-3">Логин:</dt>
+        <dd class="col-sm-9">{{ account.login }}</dd>
+
+        <dt class="col-sm-3">Пароль:</dt>
+        <dd class="col-sm-9">{{ account.password }}</dd>
+
+        <dt class="col-sm-3">IP-адрес:</dt>
+        <dd class="col-sm-9">{{ account.ip_address }}</dd>
+
+        <dt class="col-sm-3">Мобильный оператор:</dt>
+        <dd class="col-sm-9"><a href="#">{{ account.mobile_operator }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ account.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'personal-account-mobile-operator-update' account.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'personal-account-mobile-operator-delete' account.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'personal-account-mobile-operator-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+<!-- licen/templates/licen/remote_access_list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Список удаленных доступов</h2>
+        <a href="{% url 'remote-access-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i> Добавить доступ
+        </a>
+    </div>
+
+    {% if accesses %}
+    <!-- Таблица для десктопа -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Тип доступа</th>
+                    <th>Компьютер</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for access in accesses %}
+                <tr>
+                    <td>{{ access.id }}</td>
+                    <td><a href="{% url 'remote-access-detail' access.id %}">{{ access.get_name_display|truncatechars:30 }}</a></td>
+                    <td>{{ access.computer.name|default:"—" }}</td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Карточки для мобильных устройств -->
+    <div class="row row-cols-1 g-4 d-md-none">
+        {% for access in accesses %}
+        <div class="col">
+            <div class="card shadow-sm border h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">#{{ access.id }}</h5>
+                    <p class="card-text mb-2">
+                        <strong>Тип доступа:</strong> {{ access.get_name_display|truncatechars:30 }}
+                    </p>
+                    <p class="card-text mb-2">
+                        <strong>Компьютер:</strong> {{ access.computer.name|default:"—" }}
+                    </p>
+                    <div class="d-flex justify-content-start gap-2 mt-3">
+                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">Нет удалённых доступов в базе</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!-- licen/templates/licen/internet_provider_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали интернет-провайдера</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ provider.id }}</dd>
+
+        <dt class="col-sm-3">Провайдер:</dt>
+        <dd class="col-sm-9">{{ provider.provider.name }}</dd>
+
+        <dt class="col-sm-3">Цена:</dt>
+        <dd class="col-sm-9">{{ provider.price }} ₽</dd>
+
+        <dt class="col-sm-3">Скорость:</dt>
+        <dd class="col-sm-9">{{ provider.speed }}</dd>
+
+        <dt class="col-sm-3">Договор:</dt>
+        <dd class="col-sm-9">{{ provider.contract }}</dd>
+
+        <dt class="col-sm-3">Адрес:</dt>
+        <dd class="col-sm-9"><a href="#">{{ provider.address.address }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ provider.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'internet-provider-update' provider.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'internet-provider-delete' provider.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'internet-provider-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!-- licen/templates/licen/honest_sign_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии Честный Знак</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ sign.id }}</dd>
+
+        <dt class="col-sm-3">Ключ:</dt>
+        <dd class="col-sm-9">{{ sign.key }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ sign.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ sign.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Компьютер:</dt>
+        <dd class="col-sm-9"><a href="#">{{ sign.computer.name }}</a></dd>
+
+        <dt class="col-sm-3">Комментарии:</dt>
+        <dd class="col-sm-9">{{ sign.comments }}</dd>
+    </dl>
+
+    <a href="{% url 'honest-sign-update' sign.id %}" class="btn btn-warning">Редактировать</a>
+    <a href="{% url 'honest-sign-delete' sign.id %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'honest-sign-list' %}" class="btn btn-secondary">Назад к списку</a>
+</div>
+{% endblock %}

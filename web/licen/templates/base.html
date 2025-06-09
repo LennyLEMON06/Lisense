@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Адаптивное меню с боковой панелью{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"  rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"/> 
+
+  {% block css %}
+    <style>
+      /* Стили для боковой панели */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 300px;
+        background-color: #cfe2f5;
+        color: white;
+        padding: 20px;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        z-index: 1050;
+      }
+
+      /* Offcanvas стили для мобильных устройств */
+      .offcanvas-start {
+        width: 300px;
+      }
+
+      body.dark-mode .offcanvas-header {
+        background-color: #2b2b3d;
+        border-bottom-color: #444 !important;
+      }
+
+      .logo-link {
+        transition: opacity 0.2s ease;
+      }
+
+      .logo-link:hover {
+        opacity: 0.8;
+      }
+
+      .sidebar.hidden {
+        transform: translateX(-300px);
+      }
+
+      .offcanvas-body a {
+        color: #2c3e50;
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+        transition: background-color 0.3s ease;
+      }
+
+      .offcanvas-body a:hover {
+        background-color: rgb(174, 205, 241);
+      }
+
+      /* Стили для навигационной панели */
+      .navbar {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        right: 0;
+        
+        z-index: 1000;
+      }
+
+      .navbar.full-width {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .navbar-brand {
+        color: #2c3e50;
+      }
+
+      .navbar-nav .nav-link {
+        color: #2c3e50;
+        transition: color 0.3s ease;
+      }
+
+      .dropdown-menu {
+        background-color: #ffffff;
+        border: none;
+      }
+
+      .dropdown-item {
+        color: #2c3e50;
+        transition: background-color 0.3s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f8f9fa;
+      }
+
+      /* Основной контент */
+      .main-content {
+        margin-left: 30px;
+        padding: 20px;
+        margin-top: 60px;
+        transition: margin-left 0.3s ease;
+      }
+
+      .main-content.full-width {
+        margin-left: 0;
+      }
+
+      body.dark-mode {
+            background-color: #1e1e2f;
+            color: #ffffff;
+        }
+
+        .sidebar, .navbar {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Темная тема для сайдбара */
+        body.dark-mode .sidebar {
+          background-color: #2b2b3d !important;
+          color: #ffffff !important;
+        }
+
+        body.dark-mode .navbar {
+            background-color: #2b2b3d !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .main-content {
+            color: #ffffff;
+        }
+
+        /* Базовые стили для темной темы */
+        body.dark-mode {
+            background-color: #1e1e2f;
+            color: #ffffff;
+        }
+
+        /* Навбар */
+        .navbar.dark-mode {
+            background-color: #2b2b3d !important;
+            color: #ffffff !important;
+        }
+
+        /* Сайдбар */
+        .sidebar.dark-mode {
+            background-color: #2b2b3d !important;
+            color: #ffffff !important;
+        }
+
+        /* Основное содержимое */
+        .main-content.dark-mode {
+            color: #ffffff;
+        }
+
+        /* Кнопки */
+        button.dark-mode {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+
+        /* Таблицы */
+        table.dark-mode {
+            background-color: #2b2b3d;
+            color: #ffffff;
+        }
+
+
+      @media (max-width: 768px) {
+        .main-content{
+          margin-top: 80px;
+          margin-left: 0;
+        }
+        .offcanvas-start {
+          width: 100%;
+        }
+        .sidebar {
+          width: 100%;
+          transform: translateX(-100%);
+        }
+
+        .navbar {
+          width: 100%;
+          margin-left: 0;
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+      }
+      .navbar-toggler {
+        display: flex !important;
+      }
+
+      @media (max-width: 992px) {
+        .navbar .d-flex.ms-auto.me-lg-3 {
+          width: 100%;
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+
+        .navbar .form-control {
+          min-width: 100%;
+          max-width: 100%;
+        }
+
+        .navbar .btn {
+          display: none;
+        }
+
+        .navbar-nav {
+          flex-direction: row;
+          gap: 15px;
+          justify-content: center;
+          margin-top: 10px;
+        }
+
+        .dropdown-menu {
+          left: auto;
+          right: 0;
+        }
+      }
+      /* Адаптивность блоков */
+@media (max-width: 768px) {
+    .col-xxl-4, .col-xxl-8, .col-12, .col-md-4 {
+        width: 100%;
+        padding: 5px;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        padding: 0.5rem 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+/* licen/static/css/custom.css */
+
+.table thead th {
+    background-color: #f8f9fa;
+}
+
+
+.table a:hover {
+    text-decoration: underline;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1rem;
+}
+
+.card-text strong {
+    color: #6c757d;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.btn i {
+    display: flex;
+    align-items: center;
+}
+
+.btn-lg {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-sm i {
+    font-size: 1rem;
+}
+
+.d-md-none {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .d-md-none {
+        display: block !important;
+    }
+    .card-title {
+        font-size: 1.25rem;
+    }
+}
+    </style>
+  {% endblock %}
+</head>
+<body class="{% if request.session.theme == 'dark' %}dark-mode{% endif %}">
+
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg bg-light fixed-top">
+  <div class="container-fluid">
+
+    <!-- Кнопка бургера -->
+    <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Форма поиска -->
+    <div class="d-flex ms-auto me-lg-3 flex-grow-lg-1">
+    <form class="d-flex w-100" role="search" action="{% url 'search-results' %}" method="get">
+        <input class="form-control me-2 flex-grow-1" type="search" placeholder="Поиск..." aria-label="Search" name="q">
+        <button class="btn btn-outline-primary" type="submit">
+            <i class="bi bi-search"></i>
+        </button>
+    </form>
+    </div>
+
+    <!-- Правая часть навбара -->
+    <ul class="navbar-nav ms-auto ms-lg-0">
+      {% comment %} <li class="nav-item">
+          <button type="button" data-theme-toggle class="btn btn-sm btn-outline-secondary rounded-circle">
+              <i class="bi bi-moon theme-icon"></i> <!-- или bi-sun при dark mode -->
+          </button>
+      </li> {% endcomment %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'license-list' %}"><i class="bi bi-bell-fill"></i></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-square"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="{% url 'profile' %}">Профиль</a></li>          
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Боковая панель -->
+<div class="sidebar offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center px-3 py-3 border-bottom">
+    <a class="logo-link text-decoration-none" aria-current="page" href="{% url 'dashboard' %}">
+      <h1 class="mb-0 fs-4 fw-bold text-primary">LICENSE</h1>
+    </a>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <!-- Меню -->
+    <ul class="navbar-nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'city-list' %}">
+          <i class="bi bi-buildings-fill"></i> City
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'contact-person-list' %}">
+          <i class="bi bi-mailbox2"></i> Emails
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'legal-entity-list' %}">
+          <i class="bi bi-shop"></i> Network
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'network-list' %}">
+          <i class="bi bi-person-vcard-fill"></i> Legal Entity
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'address-list' %}">
+          <i class="bi bi-geo-alt-fill"></i> Addres
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'computer-list' %}">
+          <i class="bi bi-pc-display-horizontal"></i> PC
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'remote-access-list' %}">
+          <i class="bi bi-terminal-split"></i> Remote Access
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'fiscal-number-list-one' %}">
+          <i class="bi bi-bounding-box"></i> FiscalNumber
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'crypto-pro-list' %}">
+          <i class="bi bi-key-fill"></i> CryptoPro
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'ecp-list' %}">
+          <i class="bi bi-usb-plug-fill"></i> ECP
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'utmr-sakeys-list' %}">
+          <i class="bi bi-wrench-adjustable"></i> UTMRSAKeys
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'mcd-list' %}">
+          <i class="bi bi-filetype-doc"></i> MCD
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'usais-list' %}">
+          <i class="bi bi-water"></i> USAIS
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'honest-sign-list' %}">
+          <i class="bi bi-check-circle"></i> HonestSign
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'ofd-list' %}">
+          <i class="bi bi-cloud-arrow-up-fill"></i> OFD
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'mobile-operator-list' %}">
+          <i class="bi bi-phone-vibrate-fill"></i> MobileOperator
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'internet-provider-list' %}">
+          <i class="bi bi-globe"></i> InternetProvider
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'wifi-list' %}">
+          <i class="bi bi-wifi"></i> Wi-fi
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'router-admin-panel-list' %}">
+          <i class="bi bi-router-fill"></i>  RouterAdminPanel
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'personal-account-mobile-operator-list' %}">
+          <i class="bi bi-sd-card-fill"></i>  PersonalAccountMobileOperator
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'personal-account-internet-provider-list' %}">
+          <i class="bi bi-router"></i>  PersonalAccountInternetProvider
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<!-- Основной контент -->
+<div class="main-content">
+  {% block breadcrumbs %}
+    {% if breadcrumbs %}
+    <div class="container mt-5 pt-4">
+        {% comment %} <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+                {% for crumb in breadcrumbs %}
+                    <li class="breadcrumb-item">
+                        {% if not forloop.last %}
+                            <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                        {% else %}
+                            <span>{{ crumb.name }}</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav> {% endcomment %}
+    </div>
+    {% endif %}
+  {% endblock %}
+  {% block content %}
+  <h1>Dashboard</h1>
+  <p>Это основной контент страницы.</p>
+  {% endblock %}
+</div>
+
+<!-- Bootstrap JS и Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> 
+{% block js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggleButton = document.querySelector('[data-theme-toggle]');
+    if (!toggleButton) return;
+
+    const body = document.body;
+    const icon = toggleButton.querySelector('.theme-icon');
+
+    // Загружаем тему из localStorage
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+        body.classList.add('dark-mode');
+        icon.classList.replace('bi-moon', 'bi-brightness-high');
+    }
+
+    // Переключение темы по клику
+    toggleButton.addEventListener('click', function () {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            icon.classList.replace('bi-moon', 'bi-brightness-high');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.classList.replace('bi-brightness-high', 'bi-moon');
+            localStorage.removeItem('theme');
+        }
+    });
+});
+</script>
+{% endblock %}
+</body>
+</html>

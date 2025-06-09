@@ -1,0 +1,18 @@
+<!-- licen/templates/licen/remote_access_form.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        {% if computer %}
+            <a href="{% url 'computer-detail' computer.id %}" class="btn btn-secondary">Отмена</a>
+        {% else %}
+            <a href="{% url 'remote-access-list' %}" class="btn btn-secondary">Отмена</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

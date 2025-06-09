@@ -1,0 +1,29 @@
+<!-- licen/templates/licen/license_detail.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Детали лицензии: {{ object.get_verbose_name }}</h2>
+    <dl class="row mt-4">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">#{{ object.id }}</dd>
+
+        <dt class="col-sm-3">Дата начала:</dt>
+        <dd class="col-sm-9">{{ object.start_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Дата окончания:</dt>
+        <dd class="col-sm-9">{{ object.end_date|date:"d.m.Y" }}</dd>
+
+        <dt class="col-sm-3">Осталось дней:</dt>
+        <dd class="col-sm-9">
+            {% with days_left=object.days_left %}
+                {% if days_left <= 0 %}
+                    Лицензия истекла
+                {% else %}
+                    {{ days_left }} дн.
+                {% endif %}
+            {% endwith %}
+        </dd>
+    </dl>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+<h1>Добавить юридическое лицо в {{ form.initial.city|default:"город" }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
