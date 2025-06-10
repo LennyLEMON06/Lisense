@@ -69,7 +69,7 @@
         position: fixed;
         top: 0;
         right: 0;
-        
+        padding: 1rem 1rem 0.5rem 1rem;
         z-index: 1000;
       }
 
@@ -80,6 +80,7 @@
 
       .navbar-brand {
         color: #2c3e50;
+        font-weight: 600;
       }
 
       .navbar-nav .nav-link {
@@ -316,42 +317,51 @@
 <body class="{% if request.session.theme == 'dark' %}dark-mode{% endif %}">
 
 <!-- Навигационная панель -->
-<nav class="navbar navbar-expand-lg bg-light fixed-top">
+<nav class="navbar navbar-expand-lg bg-light fixed-top shadow-sm">
   <div class="container-fluid">
 
     <!-- Кнопка бургера -->
-    <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+    <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <a class="navbar-brand d-none d-md-flex align-items-center me-3" href="{% url 'dashboard' %}">
+      <i class="bi bi-key-fill me-2"></i>
+      <span>LICENSE</span>
+    </a>
+
     <!-- Форма поиска -->
-    <div class="d-flex ms-auto me-lg-3 flex-grow-lg-1">
-    <form class="d-flex w-100" role="search" action="{% url 'search-results' %}" method="get">
-        <input class="form-control me-2 flex-grow-1" type="search" placeholder="Поиск..." aria-label="Search" name="q">
-        <button class="btn btn-outline-primary" type="submit">
+    <div class="d-flex flex-grow-1 mx-2 mx-lg-0">
+      <form class="d-flex w-10" role="search" action="{% url 'search-results' %}" method="get">
+        <div class="input-group">
+          <input class="form-control" type="search" placeholder="Поиск..." aria-label="Search" name="q">
+          <button class="btn btn-outline-primary" type="submit">
             <i class="bi bi-search"></i>
-        </button>
-    </form>
+          </button>
+        </div>
+      </form>
     </div>
 
     <!-- Правая часть навбара -->
-    <ul class="navbar-nav ms-auto ms-lg-0">
+    <ul class="navbar-nav flex-row">
       {% comment %} <li class="nav-item">
           <button type="button" data-theme-toggle class="btn btn-sm btn-outline-secondary rounded-circle">
               <i class="bi bi-moon theme-icon"></i> <!-- или bi-sun при dark mode -->
           </button>
       </li> {% endcomment %}
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'license-list' %}"><i class="bi bi-bell-fill"></i></a>
+      <li class="nav-item me-2 me-lg-3">
+        <a class="nav-link position-relative" href="{% url 'license-list' %}">
+          <i class="bi bi-bell-fill"></i>
+        </a>
       </li>
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-square"></i>
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{% url 'profile' %}">Профиль</a></li>          
+          <li><a class="dropdown-item" href="{% url 'profile' %}">Профиль</a></li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Выйти</a></li>
         </ul>
       </li>
     </ul>
