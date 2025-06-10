@@ -105,7 +105,7 @@
       /* Основной контент */
       .main-content {
         margin-left: 30px;
-        padding: 20px;
+        padding: 0px 20px;
         margin-top: 60px;
         transition: margin-left 0.3s ease;
       }
@@ -227,6 +227,43 @@
           left: auto;
           right: 0;
         }
+
+        .navbar {
+    flex-wrap: nowrap;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar .container-fluid {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+  
+  .navbar .d-flex.flex-grow-1 {
+    min-width: 0;
+    flex-grow: 1;
+  }
+  
+  .navbar .input-group {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  .navbar .form-control {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .navbar .btn-outline-primary {
+    padding: 0.375rem;
+  }
+  
+  .navbar-nav.flex-row {
+    flex-wrap: nowrap;
+  }
+  
+  .navbar-brand {
+    display: none;
+  }
       }
       /* Адаптивность блоков */
 @media (max-width: 768px) {
@@ -304,12 +341,60 @@
 }
 
 @media (max-width: 768px) {
+    .navbar-toggler {
+    margin-right: 0.25rem;
+  }
+  
+  .navbar .input-group {
+    flex-wrap: nowrap;
+  }
+  
+  .navbar .form-control {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+  }
     .d-md-none {
         display: block !important;
     }
     .card-title {
         font-size: 1.25rem;
     }
+}
+
+/* Для выпадающего меню */
+.navbar .dropdown-menu {
+  position: absolute;
+  right: 0;
+  left: auto;
+  margin-top: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Для мобильных устройств */
+@media (max-width: 992px) {
+  .navbar-nav {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .dropdown-menu {
+    position: absolute !important;
+    margin: 0px;
+  }
+  
+  /* Для темной темы */
+  body.dark-mode .dropdown-menu {
+    background-color: #2b2b3d;
+    border: 1px solid #444;
+  }
+  
+  body.dark-mode .dropdown-item {
+    color: #f8f9fa;
+  }
+  
+  body.dark-mode .dropdown-item:hover {
+    background-color: #3d3d4d;
+  }
 }
     </style>
   {% endblock %}
@@ -326,16 +411,18 @@
     </button>
 
     <a class="navbar-brand d-none d-md-flex align-items-center me-3" href="{% url 'dashboard' %}">
-      <i class="bi bi-key-fill me-2"></i>
       <span>LICENSE</span>
     </a>
 
     <!-- Форма поиска -->
-    <div class="d-flex flex-grow-1 mx-2 mx-lg-0">
+    <div class="d-flex flex-grow-1 mx-2 mx-lg-0 order-1 order-lg-0">
       <form class="d-flex w-10" role="search" action="{% url 'search-results' %}" method="get">
-        <div class="input-group">
+        <div class="input-group flex-nowrap">
           <input class="form-control" type="search" placeholder="Поиск..." aria-label="Search" name="q">
-          <button class="btn btn-outline-primary" type="submit">
+          <button class="btn btn-outline-primary d-none d-md-flex" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+          <button class="btn btn-outline-primary d-md-none" type="submit">
             <i class="bi bi-search"></i>
           </button>
         </div>
