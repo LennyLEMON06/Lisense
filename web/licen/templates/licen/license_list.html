@@ -10,22 +10,38 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white border-bottom-0 pb-0 d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <h2 class="h4 mb-3 mb-md-0 fw-bold text-primary">
-                        <i class="ri-key-2-line me-2"></i>Управление лицензиями
+                        <i class="ri-key-2-line me-2"></i>Управление уведомлениями
                     </h2>
-                    <div class="d-flex flex-wrap gap-2">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
                         <a href="{% url 'license-select-type' %}" class="btn btn-primary btn-sm">
                             <i class="ri-add-line me-1"></i>Добавить лицензию
                         </a>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
+                        <div class="dropdown position-static"> <!-- Добавлен position-static -->
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="ri-filter-2-line me-1"></i>Фильтры
+                                {% if request.GET.filter %} <span class="badge bg-primary ms-1">{{ request.GET.filter|title }}</span> {% endif %}
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="?filter=all">Все лицензии</a></li>
-                                <li><a class="dropdown-item" href="?filter=active">Активные</a></li>
-                                <li><a class="dropdown-item" href="?filter=expired">Истёкшие</a></li>
-                                <li><a class="dropdown-item" href="?filter=expiring_30">Истекают через 30 дней</a></li>
-                                <li><a class="dropdown-item" href="?filter=expiring_7">Истекают через 7 дней</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'all' or not request.GET.filter %}active{% endif %}" href="?filter=all">
+                                    Все лицензии
+                                    {% if request.GET.filter == 'all' or not request.GET.filter %}<i class="ri-check-line"></i>{% endif %}
+                                </a></li>
+                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'active' %}active{% endif %}" href="?filter=active">
+                                    Активные
+                                    {% if request.GET.filter == 'active' %}<i class="ri-check-line"></i>{% endif %}
+                                </a></li>
+                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expired' %}active{% endif %}" href="?filter=expired">
+                                    Истёкшие
+                                    {% if request.GET.filter == 'expired' %}<i class="ri-check-line"></i>{% endif %}
+                                </a></li>
+                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expiring_30' %}active{% endif %}" href="?filter=expiring_30">
+                                    Истекают через 30 дней
+                                    {% if request.GET.filter == 'expiring_30' %}<i class="ri-check-line"></i>{% endif %}
+                                </a></li>
+                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expiring_7' %}active{% endif %}" href="?filter=expiring_7">
+                                    Истекают через 7 дней
+                                    {% if request.GET.filter == 'expiring_7' %}<i class="ri-check-line"></i>{% endif %}
+                                </a></li>
                             </ul>
                         </div>
                     </div>
@@ -165,7 +181,7 @@
 </div>
 {% endblock %}
 
-{% block extra_css %}
+{% block css %}
 <style>
     .table-hover tbody tr:hover {
         background-color: rgba(0, 123, 255, 0.05) !important;
