@@ -1,0 +1,79 @@
+# web/docker-compose.yml
+
+services:
+  web:
+    build: .
+    image: web-app
+    container_name: web-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_volume:/app/staticfiles
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=your-secret-key-here
+      - ALLOWED_HOSTS=*
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_NAME=mydatabase
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DJANGO_SETTINGS_MODULE=web.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: gunicorn web.wsgi:application --bind 0.0.0.0:8000
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-server
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    container_name: redis-server
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build: .
+    image: web-celery
+    container_name: celery-worker
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: celery -A web worker --loglevel=info --concurrency=2
+
+  beat:
+    build: .
+    image: web-beat
+    container_name: web-beat-1
+    depends_on:
+      - mysql
+      - redis
+    command: celery -A web beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  
+
+volumes:
+  mysql_data:
+  redis_data:
+      driver: local
+  static_volume:
+  media_volume:

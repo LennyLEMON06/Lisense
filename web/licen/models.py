@@ -574,10 +574,46 @@ class LicenseNotification(TimestampModel):
     license_type = models.CharField(max_length=100)
     license_id = models.PositiveIntegerField()
 
-    computer = models.ForeignKey('Computer', on_delete=models.CASCADE, null=True, blank=True)
-    legal_entity = models.ForeignKey(LegalEntity, on_delete=models.CASCADE, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
-
+    computer = models.ForeignKey(
+        'Computer',
+        on_delete=models.CASCADE,
+        related_name='license_notifications',
+        verbose_name=_('Компьютер'),
+        null=True,
+        blank=True,
+    )
+    legal_entity = models.ForeignKey(
+        LegalEntity,
+        on_delete=models.CASCADE,
+        related_name='license_notifications',
+        verbose_name=_('Юридическое лицо'),
+        null=True,
+        blank=True,
+    )
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.CASCADE,
+        related_name='license_notifications',
+        verbose_name=_('Адрес'),
+        null=True,
+        blank=True,
+    )
+    network = models.ForeignKey(
+        Network,
+        on_delete=models.CASCADE,
+        related_name='license_notifications',
+        verbose_name=_('Сеть'),
+        null=True,
+        blank=True,
+    )
+    city = models.ForeignKey(
+        City,
+        on_delete=models.CASCADE,
+        related_name='license_notifications',
+        verbose_name=_('Город'),
+        null=True,
+        blank=True,
+    )
     expiration_date = models.DateField(null=True, blank=True)
     days_left = models.PositiveIntegerField(null=True, blank=True)
     is_sent = models.BooleanField(default=False)

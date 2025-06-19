@@ -64,8 +64,21 @@
         <br>
         <strong>Осталось дней:</strong> {{ days_left }}
         <br><br>
-        Подробнее: 
-        <a href="{{ admin_url }}" target="_blank" class="button">Посмотреть в админке</a>
+        
+        <!-- Добавляем дополнительную информацию -->
+        <strong>Компьютер:</strong> {{ notification.computer.name }}
+        <br>
+        <strong>Адрес:</strong> {{ notification.address.address }}
+        <br>
+        <strong>Юридическое лицо:</strong> {{ notification.legal_entity.name }}
+        <br>
+        <strong>Сеть:</strong> {{ notification.network.name }}
+        <br>
+        <strong>Город:</strong> {{ notification.city.name }}
+        <br><br>
+
+        Подробнее:
+        <a href="{{ detail_url }}" target="_blank" class="button">Посмотреть детали</a>
     </div>
 
     <div class="footer">

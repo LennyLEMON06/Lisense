@@ -2088,3 +2088,13 @@ class LegalEntityCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('city-detail', kwargs={'pk': self.object.city.pk})
+
+# ====== Уведомления ======
+
+class LicenseDetail(DetailView):
+    model = LicenseNotification
+    template_name = 'licen/license_detail.html'
+    context_object_name = 'notification'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(LicenseNotification, pk=self.kwargs['pk'])
