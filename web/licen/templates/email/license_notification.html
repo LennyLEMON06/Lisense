@@ -66,19 +66,19 @@
         <br><br>
         
         <!-- Добавляем дополнительную информацию -->
-        <strong>Компьютер:</strong> {{ notification.computer.name }}
+        <strong>Компьютер:</strong> {{ computer|default:"Не указан" }}
         <br>
-        <strong>Адрес:</strong> {{ notification.address.address }}
+        <strong>Адрес:</strong> {{ address|default:"Не указан" }}
         <br>
-        <strong>Юридическое лицо:</strong> {{ notification.legal_entity.name }}
+        <strong>Юридическое лицо:</strong> {{ legal_entity|default:"Не указан" }}
         <br>
-        <strong>Сеть:</strong> {{ notification.network.name }}
+        <strong>Сеть:</strong> {{ network|default:"Не указана" }}
         <br>
-        <strong>Город:</strong> {{ notification.city.name }}
-        <br><br>
+        <strong>Город:</strong> {{ city|default:"Не указан" }}
+
 
         Подробнее:
-        <a href="{{ detail_url }}" target="_blank" class="button">Посмотреть детали</a>
+        <a href="{{detail_url }}" target="_blank" class="button">Посмотреть детали</a>
     </div>
 
     <div class="footer">

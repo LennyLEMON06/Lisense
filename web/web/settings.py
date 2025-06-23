@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
-    'licen',
+    'licen.apps.LicenConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -183,5 +183,5 @@ CELERY_BEAT_SCHEDULER = 'django'  # Используем базу данных �
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-BASE_URL = "http://127.0.0.1:8000" 
+BASE_URL = "http://localhost:8000" 
 ALLOWED_HOSTS = ['*']

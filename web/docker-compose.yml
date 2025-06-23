@@ -7,6 +7,10 @@ services:
     container_name: web-server
     ports:
       - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
     volumes:
       - static_volume:/app/staticfiles
     environment:
@@ -22,11 +26,18 @@ services:
       - DJANGO_SETTINGS_MODULE=web.settings
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    command: gunicorn web.wsgi:application --bind 0.0.0.0:8000
+    command: sh -c "
+        python manage.py collectstatic --no-input &&
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py create_celery_tasks &&
+        python manage.py runserver 0.0.0.0:8000"
+
 
   mysql:
     image: mysql:8.0
     container_name: mysql-server
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: mydatabase
@@ -38,13 +49,23 @@ services:
       - mysql_data:/var/lib/mysql
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+
   redis:
     image: redis:latest
+    container_name: redis-server
+    restart: unless-stopped
     ports:
       - "6379:6379"
-    container_name: redis-server
     volumes:
-      - redis_data:/data
+      - redis_data:/data  
 
   celery:
     build: .
@@ -53,11 +74,11 @@ services:
     depends_on:
       - mysql
       - redis
+    restart: unless-stopped
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     command: celery -A web worker --loglevel=info --concurrency=2
-
   beat:
     build: .
     image: web-beat
@@ -65,11 +86,11 @@ services:
     depends_on:
       - mysql
       - redis
+    restart: unless-stopped
     command: celery -A web beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  
 
 volumes:
   mysql_data:

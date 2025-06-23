@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.mo
+*.po
+venv/
+env/
+.git
+.env
+*.md
+media/
+node_modules/

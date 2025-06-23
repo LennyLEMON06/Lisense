@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.utils import timezone
 from datetime import timedelta
+from django.urls import reverse_lazy, reverse
 
 class LicenseBaseModel(models.Model):
     """Абстрактная базовая модель для лицензий"""
@@ -48,9 +49,37 @@ class LicenseBaseModel(models.Model):
         from django.utils import timezone
         return (self.end_date - timedelta(days=1)) == timezone.now().date()
     
+    
+    
+    @property
+    def address(self):
+        return self.computer.address if self.computer else None
+
+    @property
+    def network(self):
+        try:
+            return self.computer.address.network
+        except AttributeError:
+            return None
+
+    @property
+    def legal_entity(self):
+        try:
+            return self.computer.address.network.legal_entity
+        except AttributeError:
+            return None
+
+    @property
+    def city(self):
+        try:
+            return self.computer.address.network.legal_entity.city
+        except AttributeError:
+            return None
+
+        
     def get_verbose_name(self):
         return self._meta.verbose_name
-        
+            
     class Meta:
         abstract = True
         ordering = ['-end_date']
@@ -438,7 +467,7 @@ class CryptoPro(LicenseBaseModel):
 
     def __str__(self):
         return f"КриптоПро {self.key}"
-
+    
     class Meta:
         verbose_name = _('КриптоПро')
         verbose_name_plural = _('КриптоПро')
@@ -648,6 +677,9 @@ class LicenseNotification(TimestampModel):
             self.user_notified = user
             self.save()
         return success
+    
+    def get_absolute_url(self):
+        return reverse('license-detail', args=[str(self.pk)])
     
     # def send_to_admins(self):
     #     from django.contrib.auth import get_user_model

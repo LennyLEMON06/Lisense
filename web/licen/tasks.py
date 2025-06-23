@@ -20,6 +20,19 @@ def check_license_expirations():
         for obj in model.objects.all():
             days_left = (obj.end_date - today).days
 
+            # Получаем связанные объекты
+            computer = getattr(obj, 'computer', None)
+
+            defaults={
+                        'computer': getattr(obj, 'computer', None),
+                        'address': getattr(obj, 'address', None),
+                        'legal_entity': getattr(obj, 'legal_entity', None),
+                        'network': getattr(obj, 'network', None),
+                        'city': getattr(obj, 'city', None),
+                        'expiration_date': obj.end_date,
+                        'days_left': days_left
+                    }
+
             if days_left <= 0:
                 LicenseNotification.objects.update_or_create(
                     license_type=model.__name__,
@@ -27,8 +40,10 @@ def check_license_expirations():
                     notification_type=LicenseNotification.NotificationType.EXPIRED,
                     defaults={
                         'computer': getattr(obj, 'computer', None),
-                        'legal_entity': getattr(obj, 'legal_entity', None),
                         'address': getattr(obj, 'address', None),
+                        'legal_entity': getattr(obj, 'legal_entity', None),
+                        'network': getattr(obj, 'network', None),
+                        'city': getattr(obj, 'city', None),
                         'expiration_date': obj.end_date,
                         'days_left': 0  # Лицензия уже истекла
                     }
@@ -38,52 +53,28 @@ def check_license_expirations():
                     license_type=model.__name__,
                     license_id=obj.id,
                     notification_type=LicenseNotification.NotificationType.EXPIRING_SOON_1,
-                    defaults={
-                        'computer': getattr(obj, 'computer', None),
-                        'legal_entity': getattr(obj, 'legal_entity', None),
-                        'address': getattr(obj, 'address', None),
-                        'expiration_date': obj.end_date,
-                        'days_left': days_left
-                    }
+                    defaults=defaults
                 )
             elif days_left <= 5:
                 LicenseNotification.objects.update_or_create(
                     license_type=model.__name__,
                     license_id=obj.id,
                     notification_type=LicenseNotification.NotificationType.EXPIRING_SOON_5,
-                    computer=getattr(obj, 'computer', None),
-                    legal_entity=getattr(obj, 'legal_entity', None),
-                    address=getattr(obj, 'address', None),
-                    defaults={
-                        'expiration_date': obj.end_date,
-                        'days_left': days_left
-                    }
+                    defaults=defaults
                 )
             elif days_left <= 7:
                 LicenseNotification.objects.update_or_create(
                     license_type=model.__name__,
                     license_id=obj.id,
                     notification_type=LicenseNotification.NotificationType.EXPIRING_SOON_7,
-                    defaults={
-                        'computer': getattr(obj, 'computer', None),
-                        'legal_entity': getattr(obj, 'legal_entity', None),
-                        'address': getattr(obj, 'address', None),
-                        'expiration_date': obj.end_date,
-                        'days_left': days_left
-                    }
+                    defaults=defaults
                 )
             elif days_left <= 30:
                 LicenseNotification.objects.update_or_create(
                     license_type=model.__name__,
                     license_id=obj.id,
                     notification_type=LicenseNotification.NotificationType.EXPIRING_SOON_30,
-                    defaults={
-                        'computer': getattr(obj, 'computer', None),
-                        'legal_entity': getattr(obj, 'legal_entity', None),
-                        'address': getattr(obj, 'address', None),
-                        'expiration_date': obj.end_date,
-                        'days_left': days_left
-                    }
+                    defaults=defaults
                 )
 
     print("✅ Уведомления о лицензиях созданы")
