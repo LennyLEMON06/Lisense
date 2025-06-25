@@ -17,14 +17,16 @@ from django.db.models.functions import Lower
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from licen.models import UserProfile, LicenseNotification, User
-
-
 from licen.tasks import check_license_expirations
+from django.contrib.auth import logout
 
-def home_view(request):
-    return render(request, 'home.html')
+
 
 def login_view(request):
+    # ✅ Если пользователь уже авторизован — сразу редирект
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -39,6 +41,10 @@ def login_view(request):
     return render(request, 'licen/log/login.html', {'form': form})
 
 def register_view(request):
+    # ✅ Если пользователь уже авторизован — сразу редирект
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -48,6 +54,10 @@ def register_view(request):
         form = RegisterForm()
 
     return render(request, 'licen/log/register.html', {'form': form})
+
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
 
 
 @login_required
@@ -127,7 +137,6 @@ def user_delete(request, pk):
         'title': f"Удаление пользователя {user.username}"
     })
 
-
 class ChangePasswordView(PasswordChangeView):
     form_class = CustomPasswordChangeForm
     template_name = 'licen/profile/change_password.html'
@@ -155,7 +164,7 @@ class ChangePasswordView(PasswordChangeView):
             return reverse_lazy('user-detail', kwargs={'pk': user_id})
         return reverse_lazy('profile')
 
-
+@login_required
 def search_results(request):
     query = request.GET.get('q', '').strip()
     results = []
@@ -315,11 +324,12 @@ def search_results(request):
     })
 
 # ====== Города ======
-
+@login_required
 def city_list(request):
     cities = City.objects.all().order_by('name')
     return render(request, 'licen/city/city_list.html', {'cities': cities})
 
+@login_required
 def city_detail(request, pk):
     city = get_object_or_404(City, pk=pk)
     legal_entities = LegalEntity.objects.filter(city=city)
@@ -329,7 +339,7 @@ def city_detail(request, pk):
         'legal_entities': legal_entities
     })
 
-
+@login_required
 def legal_entity_create_for_city(request, city_id):
     city = get_object_or_404(City, id=city_id)
 
@@ -349,7 +359,7 @@ def legal_entity_create_for_city(request, city_id):
         'title': f"Добавить юридическое лицо для города «{city.name}»"
     })
 
-
+@login_required
 def city_create(request):
     if request.method == 'POST':
         form = CityForm(request.POST)
@@ -364,7 +374,7 @@ def city_create(request):
         'title': 'Добавить город'
     })
 
-
+@login_required
 def city_update(request, pk):
     city = get_object_or_404(City, pk=pk)
 
@@ -381,7 +391,7 @@ def city_update(request, pk):
         'title': f"Редактировать {city.name}"
     })
 
-
+@login_required
 def city_delete(request, pk):
     city = get_object_or_404(City, pk=pk)
 
@@ -394,7 +404,7 @@ def city_delete(request, pk):
     })
 
 # ====== Почты ======
-
+@login_required
 def contact_person_list(request):
     persons = ContactPerson.objects.all().select_related('city')
     return render(request, 'licen/contact_person/contact_person_list.html', {
@@ -402,6 +412,7 @@ def contact_person_list(request):
         'title': 'Контактные лица'
     })
 
+@login_required
 def contact_person_detail(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
     return render(request, 'licen/contact_person/contact_person_detail.html', {
@@ -409,6 +420,7 @@ def contact_person_detail(request, pk):
         'title': f"Контактное лицо: {person.full_name}"
     })
 
+@login_required
 def contact_person_create(request):
     if request.method == 'POST':
         form = ContactPersonForm(request.POST)
@@ -423,6 +435,7 @@ def contact_person_create(request):
         'title': 'Добавить контактное лицо'
     })
 
+@login_required
 def contact_person_update(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
 
@@ -439,6 +452,7 @@ def contact_person_update(request, pk):
         'title': f"Редактировать: {person.full_name}"
     })
 
+@login_required
 def contact_person_delete(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
 
@@ -451,12 +465,12 @@ def contact_person_delete(request, pk):
     })
 
 # ====== Юр. лица ======
-
+@login_required
 def legal_entity_list(request):
     legal_entities = LegalEntity.objects.all().order_by('name')
     return render(request, 'licen/legal_entity/legal_entity_list.html', {'legal_entities': legal_entities})
 
-
+@login_required
 def legal_entity_detail(request, pk):
     legal_entity = get_object_or_404(LegalEntity, id=pk)
     networks = legal_entity.networks.all().order_by('name')  # ← загружаем все сети этого юрлица
@@ -468,7 +482,7 @@ def legal_entity_detail(request, pk):
         'title': f"Сеть: {legal_entity.name}"
     })
 
-
+@login_required
 def network_create_for_legal_entity(request, legal_entity_id):
     legal_entity = get_object_or_404(LegalEntity, id=legal_entity_id)
 
@@ -488,6 +502,7 @@ def network_create_for_legal_entity(request, legal_entity_id):
         'legal_entity': legal_entity  # ← чтобы использовать в шаблоне
     })
 
+@login_required
 def legal_entity_list_for_network(request, network_id):
     network = get_object_or_404(Network, id=network_id)
     legal_entities = LegalEntity.objects.filter(networks=network)
@@ -496,7 +511,7 @@ def legal_entity_list_for_network(request, network_id):
         'network': network
     })
 
-
+@login_required
 def legal_entity_create(request):
     if request.method == 'POST':
         form = LegalEntityForm(request.POST)
@@ -511,7 +526,7 @@ def legal_entity_create(request):
         'title': 'Добавить сеть'
     })
 
-
+@login_required
 def legal_entity_update(request, pk):
     legal_entity = get_object_or_404(LegalEntity, pk=pk)
     city = legal_entity.city
@@ -530,7 +545,7 @@ def legal_entity_update(request, pk):
         'title': f"Редактировать {legal_entity.name}"
     })
 
-
+@login_required
 def legal_entity_delete(request, pk):
     legal_entity = get_object_or_404(LegalEntity, pk=pk)
 
@@ -544,12 +559,12 @@ def legal_entity_delete(request, pk):
 
 
 # ====== Сети ======
-
+@login_required
 def network_list(request):
     networks = Network.objects.all().order_by('name')
     return render(request, 'licen/network/network_list.html', {'networks': networks})
 
-
+@login_required
 def network_detail(request, pk):
     network = get_object_or_404(Network, id=pk)
     addresses = network.addresses.all().order_by('address')  # ← загружаем адреса для этой сети
@@ -562,6 +577,7 @@ def network_detail(request, pk):
         'title': f"Юридическое лицо: {network.name}"
     })
 
+@login_required
 def address_create_for_network(request, network_id):
     from licen.models import Network, Address
     from licen.forms import AddressForm
@@ -584,11 +600,13 @@ def address_create_for_network(request, network_id):
         'network': network
     })
 
+@login_required
 def network_list_for_city(request, city_id):
     city = get_object_or_404(City, id=city_id)
     networks = Network.objects.filter(legal_entity__city=city)
     return render(request, 'licen/network/network_list_for_city.html', {'networks': networks, 'city': city})
 
+@login_required
 def network_create(request):
     if request.method == 'POST':
         form = NetworkForm(request.POST)
@@ -603,7 +621,7 @@ def network_create(request):
         'title': 'Добавить юридическое лицо'
     })
 
-
+@login_required
 def network_update(request, pk):
     network = get_object_or_404(Network, pk=pk)
     legal_entity = network.legal_entity
@@ -622,7 +640,7 @@ def network_update(request, pk):
         'title': f"Редактировать {network.name}"
     })
 
-
+@login_required
 def network_delete(request, pk):
     network = get_object_or_404(Network, pk=pk)
 
@@ -636,12 +654,12 @@ def network_delete(request, pk):
 
 
 # ====== Адреса ======
-
+@login_required
 def address_list(request):
     addresses = Address.objects.all().order_by('network', 'address')
     return render(request, 'licen/address/address_list.html', {'addresses': addresses})
 
-
+@login_required
 def address_detail(request, pk):
     address = get_object_or_404(Address, id=pk)
 
@@ -670,7 +688,7 @@ def address_detail(request, pk):
         'title': f"Адрес: {address.address}"
     })
 
-
+@login_required
 def mobile_operator_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -692,6 +710,7 @@ def mobile_operator_create_for_address(request, address_id):
 
 # licen/views.py
 
+@login_required
 def personal_account_mobile_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -714,6 +733,7 @@ def personal_account_mobile_create_for_address(request, address_id):
 
 # licen/views.py
 
+@login_required
 def internet_provider_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -735,6 +755,7 @@ def internet_provider_create_for_address(request, address_id):
 
 # licen/views.py
 
+@login_required
 def personal_account_internet_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -754,6 +775,7 @@ def personal_account_internet_create_for_address(request, address_id):
         'address': address
     })
 
+@login_required
 def wifi_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -773,6 +795,7 @@ def wifi_create_for_address(request, address_id):
         'address': address
     })
 
+@login_required
 def router_admin_panel_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -792,6 +815,7 @@ def router_admin_panel_create_for_address(request, address_id):
         'address': address
     })
 
+@login_required
 def computer_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
 
@@ -811,7 +835,7 @@ def computer_create_for_address(request, address_id):
         'address': address
     })
 
-
+@login_required
 def address_create(request):
     if request.method == 'POST':
         form = AddressForm(request.POST)
@@ -826,7 +850,7 @@ def address_create(request):
         'title': 'Добавить адрес'
     })
 
-
+@login_required
 def address_update(request, pk):
     address = get_object_or_404(Address, pk=pk)
     network = address.network
@@ -845,7 +869,7 @@ def address_update(request, pk):
         'title': f"Редактировать {address.network}"
     })
 
-
+@login_required
 def address_delete(request, pk):
     address = get_object_or_404(Address, pk=pk)
 
@@ -859,12 +883,12 @@ def address_delete(request, pk):
 
 
 # ====== Компьютеры ======
-
+@login_required
 def computer_list(request):
     computers = Computer.objects.all().order_by('address', 'name')
     return render(request, 'licen/computer/computer_list.html', {'computers': computers})
 
-
+@login_required
 def computer_detail(request, pk):
     from licen.models import Computer, FiscalNumber, CryptoPro, ECP, UTMRSAKeys, MCD, HonestSign, OFD, RemoteAccess
 
@@ -899,7 +923,7 @@ def computer_detail(request, pk):
         'city': computer.address.network.legal_entity.city,
     })
 
-
+@login_required
 def fiscal_number_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
     form = FiscalNumberForm(request.POST or None)
@@ -918,6 +942,7 @@ def fiscal_number_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def crypto_pro_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -937,6 +962,7 @@ def crypto_pro_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def ecp_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -956,6 +982,7 @@ def ecp_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def utm_rsa_keys_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -975,6 +1002,7 @@ def utm_rsa_keys_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def mcd_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -994,6 +1022,7 @@ def mcd_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def honest_sign_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -1013,6 +1042,7 @@ def honest_sign_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def ofd_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -1032,6 +1062,7 @@ def ofd_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@login_required
 def remote_access_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -1051,7 +1082,7 @@ def remote_access_create_for_computer(request, computer_id):
         'computer': computer
     })
 
-
+@login_required
 def computer_create(request):
     if request.method == 'POST':
         form = ComputerForm(request.POST)
@@ -1066,7 +1097,7 @@ def computer_create(request):
         'title': 'Добавить компьютер'
     })
 
-
+@login_required
 def computer_update(request, pk):
     computer = get_object_or_404(Computer, pk=pk)
     address = computer.address
@@ -1085,7 +1116,7 @@ def computer_update(request, pk):
         'address': address
     })
 
-
+@login_required
 def computer_delete(request, pk):
     computer = get_object_or_404(Computer, pk=pk)
 
@@ -1098,17 +1129,17 @@ def computer_delete(request, pk):
     })
 
 # ====== Удаленный доступ ======
-
+@login_required
 def remote_access_list(request):
     accesses = RemoteAccess.objects.all().order_by('computer', 'name')
     return render(request, 'licen/remote_access/remote_access_list.html', {'accesses': accesses})
 
-
+@login_required
 def remote_access_detail(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
     return render(request, 'licen/remote_access/remote_access_detail.html', {'access': access})
 
-
+@login_required
 def remote_access_create(request):
     if request.method == 'POST':
         form = RemoteAccessForm(request.POST)
@@ -1123,7 +1154,7 @@ def remote_access_create(request):
         'title': 'Добавить удаленный доступ'
     })
 
-
+@login_required
 def remote_access_update(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
     computer = access.computer
@@ -1142,7 +1173,7 @@ def remote_access_update(request, pk):
         'title': f"Редактировать {access.get_name_display()}"
     })
 
-
+@login_required
 def remote_access_delete(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
 
@@ -1155,17 +1186,17 @@ def remote_access_delete(request, pk):
     })
 
 # ====== фиск накоп ======
-
+@login_required
 def fiscal_number_list_one(request):
     fiscal_numbers = FiscalNumber.objects.all().order_by('reg_number', 'model')
     return render(request, 'licen/fiscal_number/fiscal_number_list.html', {'fiscal_numbers': fiscal_numbers})
 
-
+@login_required
 def fiscal_number_detail_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
     return render(request, 'licen/fiscal_number/fiscal_number_detail.html', {'fiscal_number': fiscal_number})
 
-
+@login_required
 def fiscal_number_create_one(request):
     if request.method == 'POST':
         form = FiscalNumberForm(request.POST)
@@ -1180,7 +1211,7 @@ def fiscal_number_create_one(request):
         'title': 'Добавить ФН'
     })
 
-
+@login_required
 def fiscal_number_update_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
     computer = fiscal_number.computer
@@ -1199,7 +1230,7 @@ def fiscal_number_update_one(request, pk):
         'title': f"Редактировать {fiscal_number.model} ({fiscal_number.reg_number})"
     })
 
-
+@login_required
 def fiscal_number_delete_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
 
@@ -1213,17 +1244,17 @@ def fiscal_number_delete_one(request, pk):
 
 
 # ====== Крипто про ======
-
+@login_required
 def crypto_pro_list(request):
     crypto_pros = CryptoPro.objects.all().order_by('end_date')
     return render(request, 'licen/crypto_pro/crypto_pro_list.html', {'crypto_pros': crypto_pros})
 
-
+@login_required
 def crypto_pro_detail(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
     return render(request, 'licen/crypto_pro/crypto_pro_detail.html', {'crypto_pro': crypto_pro})
 
-
+@login_required
 def crypto_pro_create(request):
     if request.method == 'POST':
         form = CryptoProForm(request.POST)
@@ -1238,7 +1269,7 @@ def crypto_pro_create(request):
         'title': 'Добавить CryptoPro'
     })
 
-
+@login_required
 def crypto_pro_update(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
     computer = crypto_pro.computer
@@ -1257,7 +1288,7 @@ def crypto_pro_update(request, pk):
         'title': f"Редактировать {crypto_pro.key}"
     })
 
-
+@login_required
 def crypto_pro_delete(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
 
@@ -1271,17 +1302,17 @@ def crypto_pro_delete(request, pk):
 
 
 # ====== ECP ======
-
+@login_required
 def ecp_list(request):
     ecps = ECP.objects.all().order_by('full_name')
     return render(request, 'licen/ecp/ecp_list.html', {'ecps': ecps})
 
-
+@login_required
 def ecp_detail(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
     return render(request, 'licen/ecp/ecp_detail.html', {'ecp': ecp})
 
-
+@login_required
 def ecp_create(request):
     if request.method == 'POST':
         form = ECPForm(request.POST)
@@ -1296,7 +1327,7 @@ def ecp_create(request):
         'title': 'Добавить ЭЦП'
     })
 
-
+@login_required
 def ecp_update(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
     computer = ecp.computer
@@ -1315,7 +1346,7 @@ def ecp_update(request, pk):
         'title': f"Редактировать {ecp.full_name}"
     })
 
-
+@login_required
 def ecp_delete(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
 
@@ -1328,17 +1359,17 @@ def ecp_delete(request, pk):
     })
 
 # ====== utmr_sakeys ======
-
+@login_required
 def utmr_sakeys_list(request):
     keys = UTMRSAKeys.objects.all().order_by('key')
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_list.html', {'keys': keys})
 
-
+@login_required
 def utmr_sakeys_detail(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_detail.html', {'key': key})
 
-
+@login_required
 def utmr_sakeys_create(request):
     if request.method == 'POST':
         form = UTMRSAKeysForm(request.POST)
@@ -1353,7 +1384,7 @@ def utmr_sakeys_create(request):
         'title': 'Добавить УТМ RSA Ключ'
     })
 
-
+@login_required
 def utmr_sakeys_update(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
     computer = key.computer
@@ -1372,7 +1403,7 @@ def utmr_sakeys_update(request, pk):
         'title': f"Редактировать {key.key}"
     })
 
-
+@login_required
 def utmr_sakeys_delete(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
 
@@ -1385,17 +1416,17 @@ def utmr_sakeys_delete(request, pk):
     })
 
 # ====== МЧД ======
-
+@login_required
 def mcd_list(request):
     mcds = MCD.objects.all().order_by('mcd_id')
     return render(request, 'licen/mcd/mcd_list.html', {'mcds': mcds})
 
-
+@login_required
 def mcd_detail(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
     return render(request, 'licen/mcd/mcd_detail.html', {'mcd': mcd})
 
-
+@login_required
 def mcd_create(request):
     if request.method == 'POST':
         form = MCDForm(request.POST)
@@ -1410,7 +1441,7 @@ def mcd_create(request):
         'title': 'Добавить МЧД'
     })
 
-
+@login_required
 def mcd_update(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
     computer = mcd.computer
@@ -1429,7 +1460,7 @@ def mcd_update(request, pk):
         'title': f"Редактировать {mcd.mcd_id}"
     })
 
-
+@login_required
 def mcd_delete(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
 
@@ -1442,17 +1473,17 @@ def mcd_delete(request, pk):
     })
 
 # ====== ЕГАИС ======
-
+@login_required
 def usa_is_list(request):
     licenses = USAIS.objects.all().order_by('end_date', 'key')
     return render(request, 'licen/usais/usais_list.html', {'licenses': licenses})
 
-
+@login_required
 def usa_is_detail(request, pk):
     license = get_object_or_404(USAIS, id=pk)
     return render(request, 'licen/usais/usais_detail.html', {'license': license})
 
-
+@login_required
 def usa_is_create(request):
     if request.method == 'POST':
         form = USAISForm(request.POST)
@@ -1467,7 +1498,7 @@ def usa_is_create(request):
         'title': 'Добавить лицензию ЕГАИС'
     })
 
-
+@login_required
 def usa_is_update(request, pk):
     license = get_object_or_404(USAIS, id=pk)
     computer = license.computer
@@ -1486,7 +1517,7 @@ def usa_is_update(request, pk):
         'title': f"Редактировать {license.key}"
     })
 
-
+@login_required
 def usa_is_delete(request, pk):
     license = get_object_or_404(USAIS, id=pk)
 
@@ -1498,7 +1529,7 @@ def usa_is_delete(request, pk):
         'object': license
     })
 
-
+@login_required
 def usa_is_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
 
@@ -1520,17 +1551,17 @@ def usa_is_create_for_computer(request, computer_id):
 
 
 # ====== Честный знак ======
-
+@login_required
 def honest_sign_list(request):
     signs = HonestSign.objects.all().order_by('key')
     return render(request, 'licen/honest_sign/honest_sign_list.html', {'signs': signs})
 
-
+@login_required
 def honest_sign_detail(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
     return render(request, 'licen/honest_sign/honest_sign_detail.html', {'sign': sign})
 
-
+@login_required
 def honest_sign_create(request):
     if request.method == 'POST':
         form = HonestSignForm(request.POST)
@@ -1545,7 +1576,7 @@ def honest_sign_create(request):
         'title': 'Добавить Честный знак'
     })
 
-
+@login_required
 def honest_sign_update(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
     computer = sign.computer
@@ -1564,7 +1595,7 @@ def honest_sign_update(request, pk):
         'title': f"Редактировать {sign.key}"
     })
 
-
+@login_required
 def honest_sign_delete(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
 
@@ -1578,17 +1609,17 @@ def honest_sign_delete(request, pk):
 
 
 # ====== OFD ======
-
+@login_required
 def ofd_list(request):
     ofds = OFD.objects.all().order_by('reg_number')
     return render(request, 'licen/ofd/ofd_list.html', {'ofds': ofds})
 
-
+@login_required
 def ofd_detail(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
     return render(request, 'licen/ofd/ofd_detail.html', {'ofd': ofd})
 
-
+@login_required
 def ofd_create(request):
     if request.method == 'POST':
         form = OFDForm(request.POST)
@@ -1603,7 +1634,7 @@ def ofd_create(request):
         'title': 'Добавить ОФД'
     })
 
-
+@login_required
 def ofd_update(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
     computer = ofd.computer
@@ -1622,7 +1653,7 @@ def ofd_update(request, pk):
         'title': f"Редактировать {ofd.reg_number}"
     })
 
-
+@login_required
 def ofd_delete(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
 
@@ -1636,17 +1667,17 @@ def ofd_delete(request, pk):
 
 
 # ====== Мобильные операторы ======
-
+@login_required
 def mobile_operator_list(request):
     operators = MobileOperator.objects.all().order_by('operator', 'phone_number')
     return render(request, 'licen/mobile_operator/mobile_operator_list.html', {'operators': operators})
 
-
+@login_required
 def mobile_operator_detail(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
     return render(request, 'licen/mobile_operator/mobile_operator_detail.html', {'operator': operator})
 
-
+@login_required
 def mobile_operator_create(request):
     if request.method == 'POST':
         form = MobileOperatorForm(request.POST)
@@ -1661,7 +1692,7 @@ def mobile_operator_create(request):
         'title': 'Добавить мобильного оператора'
     })
 
-
+@login_required
 def mobile_operator_update(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
 
@@ -1679,7 +1710,7 @@ def mobile_operator_update(request, pk):
         'address': operator.address
     })
 
-
+@login_required
 def mobile_operator_delete(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
 
@@ -1693,17 +1724,17 @@ def mobile_operator_delete(request, pk):
 
 
 # ====== Интернет провайдер ======
-
+@login_required
 def internet_provider_list(request):
     providers = InternetProvider.objects.all().order_by('provider', 'address')
     return render(request, 'licen/internet_provider/internet_provider_list.html', {'providers': providers})
 
-
+@login_required
 def internet_provider_detail(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
     return render(request, 'licen/internet_provider/internet_provider_detail.html', {'provider': provider})
 
-
+@login_required
 def internet_provider_create(request):
     if request.method == 'POST':
         form = InternetProviderForm(request.POST)
@@ -1718,7 +1749,7 @@ def internet_provider_create(request):
         'title': 'Добавить интернет-провайдера'
     })
 
-
+@login_required
 def internet_provider_update(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
     address = provider.address
@@ -1737,7 +1768,7 @@ def internet_provider_update(request, pk):
         'address': address
     })
 
-
+@login_required
 def internet_provider_delete(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
 
@@ -1751,17 +1782,17 @@ def internet_provider_delete(request, pk):
 
 
 # ====== WiFi ======
-
+@login_required
 def wifi_list(request):
     wifis = WiFi.objects.all().order_by('name')
     return render(request, 'licen/wifi/wifi_list.html', {'wifis': wifis})
 
-
+@login_required
 def wifi_detail(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
     return render(request, 'licen/wifi/wifi_detail.html', {'wifi': wifi})
 
-
+@login_required
 def wifi_create(request):
     if request.method == 'POST':
         form = WiFiForm(request.POST)
@@ -1776,7 +1807,7 @@ def wifi_create(request):
         'title': 'Добавить WiFi'
     })
 
-
+@login_required
 def wifi_update(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
     address = wifi.address
@@ -1795,7 +1826,7 @@ def wifi_update(request, pk):
         'address': address
     })
 
-
+@login_required
 def wifi_delete(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
 
@@ -1809,17 +1840,17 @@ def wifi_delete(request, pk):
 
 
 # ====== Роутер админ панель ======
-
+@login_required
 def router_admin_panel_list(request):
     panels = RouterAdminPanel.objects.all().order_by('address', 'name')
     return render(request, 'licen/router_admin_panel/router_admin_panel_list.html', {'panels': panels})
 
-
+@login_required
 def router_admin_panel_detail(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
     return render(request, 'licen/router_admin_panel/router_admin_panel_detail.html', {'panel': panel})
 
-
+@login_required
 def router_admin_panel_create(request):
     if request.method == 'POST':
         form = RouterAdminPanelForm(request.POST)
@@ -1834,7 +1865,7 @@ def router_admin_panel_create(request):
         'title': 'Добавить панель роутера'
     })
 
-
+@login_required
 def router_admin_panel_update(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
     address = panel.address
@@ -1853,7 +1884,7 @@ def router_admin_panel_update(request, pk):
         'address': address
     })
 
-
+@login_required
 def router_admin_panel_delete(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
 
@@ -1868,17 +1899,17 @@ def router_admin_panel_delete(request, pk):
 
 # ====== Аккаунт интернет пров ======
 
-
+@login_required
 def personal_account_internet_provider_list(request):
     accounts = PersonalAccountInternetProvider.objects.all().order_by('internet_provider', 'login')
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_list.html', {'accounts': accounts})
 
-
+@login_required
 def personal_account_internet_provider_detail(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_detail.html', {'account': account})
 
-
+@login_required
 def personal_account_internet_provider_create(request):
     if request.method == 'POST':
         form = PersonalAccountInternetProviderForm(request.POST)
@@ -1893,7 +1924,7 @@ def personal_account_internet_provider_create(request):
         'title': 'Добавить личный кабинет интернет-провайдера'
     })
 
-
+@login_required
 def personal_account_internet_provider_update(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
     address = account.address
@@ -1912,7 +1943,7 @@ def personal_account_internet_provider_update(request, pk):
         'address': address
     })
 
-
+@login_required
 def personal_account_internet_provider_delete(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
 
@@ -1926,17 +1957,17 @@ def personal_account_internet_provider_delete(request, pk):
 
 
 # ====== Аккаунт мобильных операторов ======
-
+@login_required
 def personal_account_mobile_operator_list(request):
     accounts = PersonalAccountMobileOperator.objects.all().order_by('mobile_operator', 'login')
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_list.html', {'accounts': accounts})
 
-
+@login_required
 def personal_account_mobile_operator_detail(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_detail.html', {'account': account})
 
-
+@login_required
 def personal_account_mobile_operator_create(request):
     if request.method == 'POST':
         form = PersonalAccountMobileOperatorForm(request.POST)
@@ -1951,7 +1982,7 @@ def personal_account_mobile_operator_create(request):
         'title': 'Добавить личный кабинет мобильного оператора'
     })
 
-
+@login_required
 def personal_account_mobile_operator_update(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, id=pk)
     address = account.address  # ← Получаем адрес из объекта
@@ -1970,7 +2001,7 @@ def personal_account_mobile_operator_update(request, pk):
         'address': address  # ← Важно: передаём address
     })
 
-
+@login_required
 def personal_account_mobile_operator_delete(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
 
@@ -1985,7 +2016,8 @@ def personal_account_mobile_operator_delete(request, pk):
 
 
 # licen/views.py
-
+ 
+@login_required
 def license_list(request, license_type=None):
     from licen.models import LicenseBaseModel
     all_licenses = []
@@ -2006,7 +2038,7 @@ def license_list(request, license_type=None):
     return render(request, 'licen/license_list.html', context)
    
 
-
+@login_required
 def license_detail(request, license_type, license_id):
     from licen.models import LicenseBaseModel
     model_class = None
@@ -2025,6 +2057,7 @@ def license_detail(request, license_type, license_id):
     }
     return render(request, 'licen/license_detail.html', context)
 
+@login_required
 def license_create(request, license_type):
     from licen.models import LicenseBaseModel
 
@@ -2054,7 +2087,7 @@ def license_create(request, license_type):
         'title': f"Добавить {model_class._meta.verbose_name}"
     })
 
-
+@login_required
 def dashboard(request):
     context = {
         'total_licenses': LicenseNotification.objects.count(),
@@ -2067,6 +2100,7 @@ def dashboard(request):
     }
     return render(request, 'licen/dashboard.html', context)
 
+@login_required
 def license_select_type(request):
     return render(request, 'licen/license_select_type.html', {
         'title': 'Выберите тип лицензии'

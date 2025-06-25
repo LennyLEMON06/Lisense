@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import (
-
+ 
     city_list,
     city_detail,
 
@@ -22,7 +22,7 @@ from .views import (
     ChangePasswordView,
 
     login_view,
-    home_view,
+    custom_logout,
     register_view,
     
 
@@ -191,10 +191,9 @@ from .views import (
 
 
 urlpatterns = [
-    path('home/', home_view, name='home'),
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),
-    path('', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', custom_logout, name='logout'),
 
     path('search/', search_results, name='search-results'),
 

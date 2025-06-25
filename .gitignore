@@ -7,3 +7,5 @@ venv/
 /static/
 /media/
 .env
+# Игнорировать все SQL-дампы
+backups/

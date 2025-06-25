@@ -1,5 +1,3 @@
-<!-- licen/templates/email/license_notification.html -->
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,46 +5,75 @@
     <title>Уведомление о лицензии</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f6f8;
             padding: 20px;
+            color: #333;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
         }
+
         .header {
-            color: #d9534f;
+            background-color: #d9534f;
+            color: white;
+            padding: 20px;
             font-size: 22px;
             font-weight: bold;
+            text-align: center;
         }
+
         .content {
-            margin-top: 20px;
-            font-size: 16px;
-            line-height: 1.6;
+            padding: 30px 25px;
+            font-size: 15px;
+            line-height: 1.7;
         }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
-        a.button {
+
+        .content strong {
             display: inline-block;
+            width: 160px;
+            color: #222;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
-            padding: 10px 20px;
+        }
+
+        .info-table td {
+            padding: 8px 0;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
             background-color: #0275d6;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-weight: bold;
         }
-        a.button:hover {
+
+        .button:hover {
             background-color: #025a9c;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding: 15px 25px;
+            background-color: #f1f1f1;
+            font-size: 13px;
+            color: #555;
+            text-align: center;
+            border-top: 1px solid #ddd;
         }
     </style>
 </head>
@@ -56,29 +83,45 @@
     <div class="header">⚠️ Лицензия скоро истекает</div>
 
     <div class="content">
-        Уважаемый(ая) {{ user.username }},
-        <br><br>
-        Лицензия типа <strong>{{ license_type }}</strong> (ID: {{ license_id }}) скоро истекает.
-        <br><br>
-        <strong>Дата окончания:</strong> {{ expiration_date }}
-        <br>
-        <strong>Осталось дней:</strong> {{ days_left }}
-        <br><br>
-        
-        <!-- Добавляем дополнительную информацию -->
-        <strong>Компьютер:</strong> {{ computer|default:"Не указан" }}
-        <br>
-        <strong>Адрес:</strong> {{ address|default:"Не указан" }}
-        <br>
-        <strong>Юридическое лицо:</strong> {{ legal_entity|default:"Не указан" }}
-        <br>
-        <strong>Сеть:</strong> {{ network|default:"Не указана" }}
-        <br>
-        <strong>Город:</strong> {{ city|default:"Не указан" }}
+        <p>Уважаемый(ая) <strong>{{ user.username }}</strong>,</p>
+        <p>
+            Лицензия типа <strong>{{ license_type }}</strong> (ID: {{ license_id }}) скоро истекает.
+        </p>
 
+        <table class="info-table">
+            <tr>
+                <td><strong>Дата окончания:</strong></td>
+                <td>{{ expiration_date }}</td>
+            </tr>
+            <tr>
+                <td><strong>Осталось дней:</strong></td>
+                <td>{{ days_left }}</td>
+            </tr>
+            <tr>
+                <td><strong>Компьютер:</strong></td>
+                <td>{{ computer|default:"Не указан" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Адрес:</strong></td>
+                <td>{{ address|default:"Не указан" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Юридическое лицо:</strong></td>
+                <td>{{ network|default:"Не указана" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Сеть:</strong></td>
+                <td>{{ legal_entity|default:"Не указано" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Город:</strong></td>
+                <td>{{ city|default:"Не указан" }}</td>
+            </tr>
+        </table>
 
-        Подробнее:
-        <a href="{{detail_url }}" target="_blank" class="button">Посмотреть детали</a>
+        <p>
+            <a href="{{ detail_url }}" target="_blank" class="button">Посмотреть детали</a>
+        </p>
     </div>
 
     <div class="footer">
