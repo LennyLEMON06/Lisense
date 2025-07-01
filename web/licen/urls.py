@@ -189,7 +189,6 @@ from .views import (
     personal_account_mobile_operator_delete,
 )
 
-
 urlpatterns = [
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),

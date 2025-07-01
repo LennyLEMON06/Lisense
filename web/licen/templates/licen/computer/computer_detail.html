@@ -2,533 +2,666 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Детали компьютера</h2>
-    <dl class="row">
-        <dt class="col-sm-3">ID:</dt>
-        <dd class="col-sm-9">#{{ computer.id }}</dd>
+<div class="container mt-4">
+    <h2 class="mb-4">Детали компьютера</h2>
+    
+    <!-- Карточка с деталями компьютера -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID:</dt>
+                <dd class="col-sm-9">#{{ computer.id }}</dd>
 
-        <dt class="col-sm-3">Имя:</dt>
-        <dd class="col-sm-9">{{ computer.name }}</dd>
+                <dt class="col-sm-3">Имя:</dt>
+                <dd class="col-sm-9">{{ computer.name }}</dd>
 
-        <dt class="col-sm-3">IPv4 адрес:</dt>
-        <dd class="col-sm-9">{{ computer.ipv4_address }}</dd>
+                <dt class="col-sm-3">IPv4 адрес:</dt>
+                <dd class="col-sm-9">{{ computer.ipv4_address }}</dd>
 
-        <dt class="col-sm-3">MAC-адрес:</dt>
-        <dd class="col-sm-9">{{ computer.mac_address }}</dd>
+                <dt class="col-sm-3">MAC-адрес:</dt>
+                <dd class="col-sm-9">{{ computer.mac_address }}</dd>
 
-        {% if city %}
-        <dt class="col-sm-3">Город:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'city-detail' city.id %}">{{ city.name }}</a>
-        </dd>
-        {% endif %}
+                {% if city %}
+                <dt class="col-sm-3">Город:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'city-detail' city.id %}">{{ city.name }}</a>
+                </dd>
+                {% endif %}
 
-        {% if legal_entity %}
-        <dt class="col-sm-3">Сеть:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'legal-entity-detail' legal_entity.id %}">{{ legal_entity.name }}</a>
-        </dd>
-        {% endif %}
+                {% if legal_entity %}
+                <dt class="col-sm-3">Сеть:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'legal-entity-detail' legal_entity.id %}">{{ legal_entity.name }}</a>
+                </dd>
+                {% endif %}
 
-        {% if network %}
-        <dt class="col-sm-3">Юридическое лицо:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'legal-entity-detail' network.id %}">
-                {{ network.name }} (ИНН: {{ network.inn }})
-            </a>
-        </dd>
-        {% endif %}
+                {% if network %}
+                <dt class="col-sm-3">Юридическое лицо:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'network-detail' network.id %}">
+                        {{ network.name }} (ИНН: {{ network.inn }})
+                    </a>
+                </dd>
+                {% endif %}
 
-        {% if address %}
-        <dt class="col-sm-3">Адрес:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'address-detail' address.id %}">{{ address.address }}</a>
-        </dd>
-        {% endif %}
+                {% if address %}
+                <dt class="col-sm-3">Адрес:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'address-detail' address.id %}">{{ address.address }}</a>
+                </dd>
+                {% endif %}
 
-        <dt class="col-sm-3">Комментарии:</dt>
-        <dd class="col-sm-9">{{ computer.comments|default:"—" }}</dd>
-    </dl>
+                <dt class="col-sm-3">Комментарии:</dt>
+                <dd class="col-sm-9">{{ computer.comments|default:"—" }}</dd>
+            </dl>
+        </div>
+    </div>
 
     <!-- Кнопки управления -->
-    <div class="mt-4">
+    <div class="d-flex flex-wrap gap-3 mb-5">
         <a href="{% url 'computer-update' computer.id %}" class="btn btn-warning">Редактировать</a>
         <a href="{% url 'computer-delete' computer.id %}" class="btn btn-danger">Удалить</a>
         <a href="{% url 'computer-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 
-    <!-- Фискальные номера -->
-    <hr>
-    <h4>Фискальные номера</h4>
-    <a href="{% url 'fiscal-number-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if fiscal_numbers %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>ЗН</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in fiscal_numbers %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'fiscal-number-detail-one' item.id %}">{{ item.zn }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'fiscal-number-detail-one' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'fiscal-number-update-one' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция фискальных номеров -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Фискальные номера</h4>
+            <a href="{% url 'fiscal-number-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if fiscal_numbers %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>ЗН</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in fiscal_numbers %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'fiscal-number-detail-one' item.id %}">{{ item.zn }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'fiscal-number-detail-one' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'fiscal-number-update-one' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'fiscal-number-delete-one' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Карточки для мобильных -->
+        <div class="d-md-none">
+            {% for item in fiscal_numbers %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>ЗН:</strong> <a href="{% url 'fiscal-number-detail-one' item.id %}">{{ item.zn }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'fiscal-number-detail-one' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'fiscal-number-update-one' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'fiscal-number-delete-one' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Карточки для мобильных -->
-    <div class="d-md-none">
-        {% for item in fiscal_numbers %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>ЗН:</strong> <a href="{% url 'fiscal-number-detail-one' item.id %}">{{ item.zn }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'fiscal-number-detail-one' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'fiscal-number-update-one' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'fiscal-number-delete-one' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет фискальных номеров на этом компьютере.
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет фискальных номеров на этом компьютере.</p>
-    {% endif %}
 
-    <!-- CryptoPro -->
-    <hr>
-    <h4>CryptoPro</h4>
-    <a href="{% url 'crypto-pro-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if crypto_pros %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Ключ</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in crypto_pros %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'crypto-pro-detail' item.id %}">{{ item.key }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция CryptoPro -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>CryptoPro</h4>
+            <a href="{% url 'crypto-pro-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if crypto_pros %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Ключ</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in crypto_pros %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'crypto-pro-detail' item.id %}">{{ item.key }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'crypto-pro-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in crypto_pros %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Ключ:</strong> <a href="{% url 'crypto-pro-detail' item.id %}">{{ item.key }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'crypto-pro-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in crypto_pros %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Ключ:</strong> <a href="{% url 'crypto-pro-detail' item.id %}">{{ item.key }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'crypto-pro-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'crypto-pro-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'crypto-pro-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет установленной лицензии CryptoPro.
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет установленной лицензии CryptoPro.</p>
-    {% endif %}
 
-    <!-- ЭЦП -->
-    <hr>
-    <h4>ЭЦП</h4>
-    <a href="{% url 'ecp-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if ecp_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>ФИО</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in ecp_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'ecp-detail' item.id %}">{{ item.full_name }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'ecp-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ecp-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция ЭЦП -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>ЭЦП</h4>
+            <a href="{% url 'ecp-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if ecp_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>ФИО</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ecp_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'ecp-detail' item.id %}">{{ item.full_name }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'ecp-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'ecp-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'ecp-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in ecp_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>ФИО:</strong> <a href="{% url 'ecp-detail' item.id %}">{{ item.full_name }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'ecp-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'ecp-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'ecp-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in ecp_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>ФИО:</strong> <a href="{% url 'ecp-detail' item.id %}">{{ item.full_name }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'ecp-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ecp-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'ecp-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет установленной ЭЦП.
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет установленной ЭЦП.</p>
-    {% endif %}
 
-    <!-- УТМ RSA ключи -->
-    <hr>
-    <h4>УТМ RSA ключи</h4>
-    <a href="{% url 'utm-rsa-keys-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if utm_rsa_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Ключ</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in utm_rsa_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'utmr-sakeys-detail' item.id %}">{{ item.key }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'utmr-sakeys-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'utmr-sakeys-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция УТМ RSA ключей -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>УТМ RSA ключи</h4>
+            <a href="{% url 'utm-rsa-keys-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if utm_rsa_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Ключ</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in utm_rsa_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'utmr-sakeys-detail' item.id %}">{{ item.key }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'utmr-sakeys-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'utmr-sakeys-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'utmr-sakeys-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in utm_rsa_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Ключ:</strong> <a href="{% url 'utmr-sakeys-detail' item.id %}">{{ item.key }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'utmr-sakeys-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'utmr-sakeys-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'utmr-sakeys-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in utm_rsa_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Ключ:</strong> <a href="{% url 'utmr-sakeys-detail' item.id %}">{{ item.key }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'utmr-sakeys-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'utmr-sakeys-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'utmr-sakeys-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет УТМ RSA ключей.
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет УТМ RSA ключей.</p>
-    {% endif %}
 
-    <!-- МЧД -->
-    <hr>
-    <h4>МЧД (маркировка Честный знак)</h4>
-    <a href="{% url 'mcd-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if mcd_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Идентификатор</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in mcd_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'mcd-detail' item.id %}">{{ item.mcd_id }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'mcd-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'mcd-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция МЧД -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>МЧД (маркировка Честный знак)</h4>
+            <a href="{% url 'mcd-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if mcd_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Идентификатор</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in mcd_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'mcd-detail' item.id %}">{{ item.mcd_id }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'mcd-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'mcd-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'mcd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in mcd_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Идентификатор:</strong> <a href="{% url 'mcd-detail' item.id %}">{{ item.mcd_id }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'mcd-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'mcd-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'mcd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in mcd_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Идентификатор:</strong> <a href="{% url 'mcd-detail' item.id %}">{{ item.mcd_id }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'mcd-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'mcd-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'mcd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет лицензии МЧД
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет лицензии МЧД</p>
-    {% endif %}
 
-    <!-- ЕГАИС -->
-    <hr>
-    <h4>ЕГАИС</h4>
-    <a href="{% url 'usais-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if usais_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Ключ</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in usais_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'usais-detail' item.id %}">{{ item.key }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'usais-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'usais-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция ЕГАИС -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>ЕГАИС</h4>
+            <a href="{% url 'usais-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if usais_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Ключ</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in usais_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'usais-detail' item.id %}">{{ item.key }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'usais-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'usais-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'usais-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in usais_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Ключ:</strong> <a href="{% url 'usais-detail' item.id %}">{{ item.key }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'usais-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'usais-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'usais-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in usais_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Ключ:</strong> <a href="{% url 'usais-detail' item.id %}">{{ item.key }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'usais-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'usais-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'usais-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет лицензий ЕГАИС
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет лицензий ЕГАИС</p>
-    {% endif %}
 
-    <!-- Честный знак -->
-    <hr>
-    <h4>Честный знак</h4>
-    <a href="{% url 'honest-sign-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if honest_sign_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Логин</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in honest_sign_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'honest-sign-detail' item.id %}">{{ item.key }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'honest-sign-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'honest-sign-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция Честный знак -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Честный знак</h4>
+            <a href="{% url 'honest-sign-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if honest_sign_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Логин</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in honest_sign_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'honest-sign-detail' item.id %}">{{ item.key }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'honest-sign-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'honest-sign-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'honest-sign-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in honest_sign_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Логин:</strong> <a href="{% url 'honest-sign-detail' item.id %}">{{ item.key }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'honest-sign-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'honest-sign-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'honest-sign-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in honest_sign_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Логин:</strong> <a href="{% url 'honest-sign-detail' item.id %}">{{ item.key }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'honest-sign-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'honest-sign-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'honest-sign-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет лицензии Честного знака
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет лицензии Честного знака</p>
-    {% endif %}
 
-    <!-- ОФД -->
-    <hr>
-    <h4>ОФД</h4>
-    <a href="{% url 'ofd-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if ofd_list %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Регистрационный номер</th>
-                    <th>Дата окончания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in ofd_list %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td><a href="{% url 'ofd-detail' item.id %}">{{ item.reg_number }}</a></td>
-                    <td>{{ item.end_date|date:"d.m.Y" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'ofd-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ofd-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция ОФД -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>ОФД</h4>
+            <a href="{% url 'ofd-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if ofd_list %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Регистрационный номер</th>
+                        <th>Дата окончания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ofd_list %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="{% url 'ofd-detail' item.id %}">{{ item.reg_number }}</a></td>
+                        <td>{{ item.end_date|date:"d.m.Y" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'ofd-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'ofd-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'ofd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for item in ofd_list %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ item.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Рег. номер:</strong> <a href="{% url 'ofd-detail' item.id %}">{{ item.reg_number }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'ofd-detail' item.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'ofd-update' item.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'ofd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-md-none">
-        {% for item in ofd_list %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ item.id }}</p>
-                <p><strong>Рег. номер:</strong> <a href="{% url 'ofd-detail' item.id %}">{{ item.reg_number }}</a></p>
-                <p><strong>Дата окончания:</strong> {{ item.end_date|date:"d.m.Y" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'ofd-detail' item.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'ofd-update' item.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'ofd-delete' item.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p class="text-muted">Нет лицензии ОФД</p>
-    {% endif %}
-
-    <!-- Удалённый доступ -->
-    <hr>
-    <h4>Удалённый доступ</h4>
-    <a href="{% url 'remote-access-create-for-computer' computer.id %}" class="btn btn-success mb-3">+ Добавить</a>
-    {% if remote_accesses %}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Тип</th>
-                    <th>Адрес</th>
-                    <th>Пароль</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for access in remote_accesses %}
-                <tr>
-                    <td>{{ access.id }}</td>
-                    <td>{{ access.get_name_display }}</td>
-                    <td><a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a></td>
-                    <td>{{ access.password|default:"—" }}</td>
-                    <td class="text-nowrap">
-                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет лицензии ОФД
+        </div>
+        {% endif %}
     </div>
 
-    <div class="d-md-none">
-        {% for access in remote_accesses %}
-        <div class="card shadow-sm border mb-3">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ access.id }}</p>
-                <p><strong>Тип:</strong> {{ access.get_name_display }}</p>
-                <p><strong>Адрес:</strong> <a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a></p>
-                <p><strong>Пароль:</strong> {{ access.password|default:"—" }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+    <!-- Секция удалённого доступа -->
+    <div class="section-block">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Удалённый доступ</h4>
+            <a href="{% url 'remote-access-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if remote_accesses %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Тип</th>
+                        <th>Адрес</th>
+                        <th>Пароль</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for access in remote_accesses %}
+                    <tr>
+                        <td>{{ access.id }}</td>
+                        <td>{{ access.get_name_display }}</td>
+                        <td><a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a></td>
+                        <td>{{ access.password|default:"—" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for access in remote_accesses %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ access.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Тип:</strong> {{ access.get_name_display }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Адрес:</strong> <a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Пароль:</strong> {{ access.password|default:"—" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                </td>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет удалённого доступа
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="text-muted">Нет удалённого доступа</p>
-    {% endif %}
-
 </div>
 {% endblock %}

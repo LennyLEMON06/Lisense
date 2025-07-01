@@ -1,54 +1,62 @@
 <!-- licen/templates/licen/address_detail.html -->
-
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Детали адреса</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Детали адреса</h2>
 
-    <dl class="row">
-        <dt class="col-sm-3">ID:</dt>
-        <dd class="col-sm-9">#{{ address.id }}</dd>
+    <!-- Карточка с деталями адреса -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID:</dt>
+                <dd class="col-sm-9">#{{ address.id }}</dd>
 
-        <dt class="col-sm-3">Город:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'city-detail' address.network.legal_entity.city.id %}">
-                {{ address.network.legal_entity.city.name }}
-            </a>
-        </dd>
+                <dt class="col-sm-3">Город:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'city-detail' address.network.legal_entity.city.id %}">
+                        {{ address.network.legal_entity.city.name }}
+                    </a>
+                </dd>
 
-        <dt class="col-sm-3">Юридическое лицо:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'legal-entity-detail' address.network.legal_entity.id %}">
-                {{ address.network.name }} (ИНН: {{ address.network.inn }})
-            </a>
-        </dd>
+                <dt class="col-sm-3">Юридическое лицо:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'network-detail' address.network.id %}">
+                        {{ address.network.name }} (ИНН: {{ address.network.inn }})
+                    </a>
+                </dd>
 
-        <dt class="col-sm-3">Сеть:</dt>
-        <dd class="col-sm-9">
-            <a href="{% url 'network-detail' address.network.id %}">
-                {{ address.network.legal_entity.name }}
-            </a>
-        </dd>
-        
-        <dt class="col-sm-3">Адрес:</dt>
-        <dd class="col-sm-9">{{ address.address }}</dd>
+                <dt class="col-sm-3">Сеть:</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'legal-entity-detail' address.network.id %}">
+                        {{ address.network.legal_entity.name }}
+                    </a>
+                </dd>
+                
+                <dt class="col-sm-3">Адрес:</dt>
+                <dd class="col-sm-9">{{ address.address }}</dd>
 
-        <dt class="col-sm-3">Комментарии:</dt>
-        <dd class="col-sm-9">{{ address.comments }}</dd>
-    </dl>
+                <dt class="col-sm-3">Комментарии:</dt>
+                <dd class="col-sm-9">{{ address.comments|default:"—" }}</dd>
+            </dl>
+        </div>
+    </div>
 
-    <div class="mt-4">
+    <!-- Кнопки управления -->
+    <div class="d-flex flex-wrap gap-3 mb-5">
         <a href="{% url 'address-update' address.id %}" class="btn btn-warning">Редактировать</a>
         <a href="{% url 'address-delete' address.id %}" class="btn btn-danger">Удалить</a>
         <a href="{% url 'address-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 
-    <!-- Таблица компьютеров -->
-    <hr>
-    <h4>Компьютеры</h4>
-    <a href="{% url 'computer-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if computer %}
-            <div class="table-responsive d-none d-md-block">
+    <!-- Секция компьютеров -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Компьютеры</h4>
+            <a href="{% url 'computer-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if computer %}
+            <div class="table-responsive d-none d-md-block mb-3">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
@@ -66,9 +74,11 @@
                             <td>{{ computer.mac_address }}</td>
                             <td>{{ computer.ipv4_address }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -79,28 +89,42 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ computer.id }}</p>
-                        <p><strong>Имя:</strong> {{ computer.name }}</p>
-                        <p><strong>MAC:</strong> {{ computer.mac_address }}</p>
-                        <p><strong>IP:</strong> {{ computer.ipv4_address }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ computer.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Имя:</strong> {{ computer.name }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>MAC:</strong> {{ computer.mac_address }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>IP:</strong> {{ computer.ipv4_address }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-            <p class="text-muted">Нет привязанного компьютера</p>
+            <div class="alert alert-info mb-0">
+                Нет привязанного компьютера
+            </div>
         {% endif %}
+    </div>
 
-    <!-- Таблица мобильных операторов -->
-    <hr>
-    <h4>Мобильные операторы</h4>
-    <a href="{% url 'mobile-operator-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if mobile_operator %}
-            <div class="table-responsive d-none d-md-block">
+    <!-- Секция мобильных операторов -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Мобильные операторы</h4>
+            <a href="{% url 'mobile-operator-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if mobile_operator %}
+            <div class="table-responsive d-none d-md-block mb-3">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
@@ -118,9 +142,11 @@
                             <td>{{ mobile_operator.phone_number }}</td>
                             <td>{{ mobile_operator.employee_name }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'mobile-operator-detail' mobile_operator.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'mobile-operator-update' mobile_operator.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'mobile-operator-delete' mobile_operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'mobile-operator-detail' mobile_operator.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'mobile-operator-update' mobile_operator.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'mobile-operator-delete' mobile_operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -131,29 +157,43 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ mobile_operator.id }}</p>
-                        <p><strong>Оператор:</strong> {{ mobile_operator.operator.name }}</p>
-                        <p><strong>Номер:</strong> {{ mobile_operator.phone_number }}</p>
-                        <p><strong>ФИО:</strong> {{ mobile_operator.employee_name }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'mobile-operator-detail' mobile_operator.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'mobile-operator-update' mobile_operator.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'mobile-operator-delete' mobile_operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ mobile_operator.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Оператор:</strong> {{ mobile_operator.operator.name }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Номер:</strong> {{ mobile_operator.phone_number }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>ФИО:</strong> {{ mobile_operator.employee_name }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'mobile-operator-detail' mobile_operator.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'mobile-operator-update' mobile_operator.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'mobile-operator-delete' mobile_operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-            <p class="text-muted">Нет мобильного оператора на этом адресе</p>
+            <div class="alert alert-info mb-0">
+                Нет мобильного оператора на этом адресе
+            </div>
         {% endif %}
+    </div>
 
-    <!-- Таблица личных кабинетов мобильного оператора -->
-    <hr>
-    <h4>Личный кабинет мобильного оператора</h4>
-    <a href="{% url 'personal-account-mobile-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if personal_account_mobile %}
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover">
+    <!-- Секция личных кабинетов мобильных операторов -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Личный кабинет мобильного оператора</h4>
+            <a href="{% url 'personal-account-mobile-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if personal_account_mobile %}
+            <div class="table-responsive d-none d-md-block mb-3">
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
@@ -168,9 +208,11 @@
                             <td><a href="{% url 'personal-account-mobile-operator-detail' personal_account_mobile.id %}">{{ personal_account_mobile.login }}</a></td>
                             <td>{{ personal_account_mobile.ip_address }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'personal-account-mobile-operator-detail' personal_account_mobile.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'personal-account-mobile-operator-update' personal_account_mobile.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'personal-account-mobile-operator-delete' personal_account_mobile.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'personal-account-mobile-operator-detail' personal_account_mobile.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'personal-account-mobile-operator-update' personal_account_mobile.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'personal-account-mobile-operator-delete' personal_account_mobile.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -181,27 +223,39 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ personal_account_mobile.id }}</p>
-                        <p><strong>Логин:</strong> {{ personal_account_mobile.login }}</p>
-                        <p><strong>IP:</strong> {{ personal_account_mobile.ip_address }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'personal-account-mobile-operator-detail' personal_account_mobile.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'personal-account-mobile-operator-update' personal_account_mobile.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'personal-account-mobile-operator-delete' personal_account_mobile.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ personal_account_mobile.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Логин:</strong> {{ personal_account_mobile.login }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>IP:</strong> {{ personal_account_mobile.ip_address }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'personal-account-mobile-operator-detail' personal_account_mobile.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'personal-account-mobile-operator-update' personal_account_mobile.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'personal-account-mobile-operator-delete' personal_account_mobile.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-        <p class="text-muted">Нет личного кабинета мобильного оператора</p>
+            <div class="alert alert-info mb-0">
+                Нет личного кабинета мобильного оператора
+            </div>
         {% endif %}
+    </div>
 
-    <!-- Таблица интернет-провайдера -->
-    <hr>
-    <h4>Интернет-провайдеры</h4>
-    <a href="{% url 'internet-provider-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if internet_provider %}
-            <div class="table-responsive d-none d-md-block">
+    <!-- Секция интернет-провайдеров -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Интернет-провайдеры</h4>
+            <a href="{% url 'internet-provider-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if internet_provider %}
+            <div class="table-responsive d-none d-md-block mb-3">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
@@ -217,9 +271,11 @@
                             <td>{{ internet_provider.provider.name }}</td>
                             <td>{{ internet_provider.contract }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'internet-provider-detail' internet_provider.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'internet-provider-update' internet_provider.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'internet-provider-delete' internet_provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'internet-provider-detail' internet_provider.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'internet-provider-update' internet_provider.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'internet-provider-delete' internet_provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -230,78 +286,102 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ internet_provider.id }}</p>
-                        <p><strong>Провайдер:</strong> {{ internet_provider.provider.name }}</p>
-                        <p><strong>Договор:</strong> {{ internet_provider.contract }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'internet-provider-detail' internet_provider.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'internet-provider-update' internet_provider.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'internet-provider-delete' internet_provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ internet_provider.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Провайдер:</strong> {{ internet_provider.provider.name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Договор:</strong> {{ internet_provider.contract }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'internet-provider-detail' internet_provider.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'internet-provider-update' internet_provider.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'internet-provider-delete' internet_provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-        <p class="text-muted">Нет интернет-провайдера</p>
+            <div class="alert alert-info mb-0">
+                Нет интернет-провайдера
+            </div>
         {% endif %}
+    </div>
 
-    <!-- Таблица личных кабинетов интернет-провайдера -->
-    <hr>
-    <h4>Личный кабинет интернет-провайдера</h4>
-    <a href="{% url 'personal-account-internet-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if personal_account_internet %}
-        <!-- Таблица для десктопа -->
-        <div class="table-responsive d-none d-md-block">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Логин</th>
-                        <th>IP-адрес</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ personal_account_internet.id }}</td>
-                        <td><a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}">{{ personal_account_internet.login }}</a></td>
-                        <td>{{ personal_account_internet.ip_address }}</td>
-                        <td class="text-nowrap">
-                            <a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                            <a href="{% url 'personal-account-internet-provider-update' personal_account_internet.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'personal-account-internet-provider-delete' personal_account_internet.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Секция личных кабинетов интернет-провайдеров -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Личный кабинет интернет-провайдера</h4>
+            <a href="{% url 'personal-account-internet-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
         </div>
+        
+        {% if personal_account_internet %}
+            <div class="table-responsive d-none d-md-block mb-3">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Логин</th>
+                            <th>IP-адрес</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ personal_account_internet.id }}</td>
+                            <td><a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}">{{ personal_account_internet.login }}</a></td>
+                            <td>{{ personal_account_internet.ip_address }}</td>
+                            <td class="text-nowrap">
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'personal-account-internet-provider-update' personal_account_internet.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'personal-account-internet-provider-delete' personal_account_internet.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Карточка для мобильных устройств -->
-        <div class="d-md-none">
-            <div class="card shadow-sm border mb-3">
-                <div class="card-body">
-                    <p><strong>ID:</strong> {{ personal_account_internet.id }}</p>
-                    <p><strong>Логин:</strong> {{ personal_account_internet.login }}</p>
-                    <p><strong>IP:</strong> {{ personal_account_internet.ip_address }}</p>
-                    <td class="text-nowrap">
-                            <a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                            <a href="{% url 'personal-account-internet-provider-update' personal_account_internet.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+            <!-- Карточка для мобильного -->
+            <div class="d-md-none">
+                <div class="card shadow-sm border mb-3">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ personal_account_internet.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Логин:</strong> {{ personal_account_internet.login }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>IP:</strong> {{ personal_account_internet.ip_address }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'personal-account-internet-provider-detail' personal_account_internet.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'personal-account-internet-provider-update' personal_account_internet.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'personal-account-internet-provider-delete' personal_account_internet.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                        </div>
+                    </div>
                 </div>
             </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                Нет личного кабинета интернет-провайдера
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Секция WiFi сетей -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>WiFi сети</h4>
+            <a href="{% url 'wifi-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
         </div>
-
-    {% else %}
-    <p class="text-muted">Нет личного кабинета интернет-провайдера</p>
-    {% endif %}
-
-    <!-- Таблица WiFi сетей -->
-    <hr>
-    <h4>WiFi сети</h4>
-    <a href="{% url 'wifi-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if wifi %}
-            <div class="table-responsive d-none d-md-block">
+        
+        {% if wifi %}
+            <div class="table-responsive d-none d-md-block mb-3">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
@@ -317,9 +397,11 @@
                             <td><a href="{% url 'wifi-detail' wifi.id %}">{{ wifi.name }}</a></td>
                             <td>{{ wifi.get_frequency_band_display }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -330,27 +412,39 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ wifi.id }}</p>
-                        <p><strong>Название:</strong> {{ wifi.name }}</p>
-                        <p><strong>Диапазон:</strong> {{ wifi.get_frequency_band_display }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ wifi.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Название:</strong> {{ wifi.name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Диапазон:</strong> {{ wifi.get_frequency_band_display }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-        <p class="text-muted">Нет сохранённых WiFi сетей</p>
+            <div class="alert alert-info mb-0">
+                Нет сохранённых WiFi сетей
+            </div>
         {% endif %}
+    </div>
 
-    <!-- Таблица роутеров -->
-    <hr>
-    <h4>Доступ к админ-панели роутера</h4>
-    <a href="{% url 'router-admin-panel-create-for-address' address.id %}" class="btn btn-success btn-sm mb-3">+ Добавить</a>
-    {% if router_admin_panel %}
-            <div class="table-responsive d-none d-md-block">
+    <!-- Секция роутеров -->
+    <div class="section-block">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Доступ к админ-панели роутера</h4>
+            <a href="{% url 'router-admin-panel-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if router_admin_panel %}
+            <div class="table-responsive d-none d-md-block mb-3">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
@@ -368,9 +462,11 @@
                             <td>{{ router_admin_panel.ip_address }}</td>
                             <td>{{ router_admin_panel.access_id }}</td>
                             <td class="text-nowrap">
-                                <a href="{% url 'router-admin-panel-detail' router_admin_panel.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'router-admin-panel-update' router_admin_panel.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'router-admin-panel-delete' router_admin_panel.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'router-admin-panel-detail' router_admin_panel.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'router-admin-panel-update' router_admin_panel.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'router-admin-panel-delete' router_admin_panel.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -381,21 +477,31 @@
             <div class="d-md-none">
                 <div class="card shadow-sm border mb-3">
                     <div class="card-body">
-                        <p><strong>ID:</strong> {{ router_admin_panel.id }}</p>
-                        <p><strong>Название:</strong> {{ router_admin_panel.name }}</p>
-                        <p><strong>IP:</strong> {{ router_admin_panel.ip_address }}</p>
-                        <p><strong>Доступ:</strong> {{ router_admin_panel.access_id }}</p>
-                        <td class="text-nowrap">
-                                <a href="{% url 'router-admin-panel-detail' router_admin_panel.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'router-admin-panel-update' router_admin_panel.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'router-admin-panel-delete' router_admin_panel.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                        </td>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ router_admin_panel.id }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Название:</strong> {{ router_admin_panel.name }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>IP:</strong> {{ router_admin_panel.ip_address }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Доступ:</strong> {{ router_admin_panel.access_id }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'router-admin-panel-detail' router_admin_panel.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'router-admin-panel-update' router_admin_panel.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'router-admin-panel-delete' router_admin_panel.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         {% else %}
-        <p class="text-muted">Нет доступа к панели роутера</p>
+            <div class="alert alert-info mb-0">
+                Нет доступа к панели роутера
+            </div>
         {% endif %}
-
+    </div>
 </div>
 {% endblock %}

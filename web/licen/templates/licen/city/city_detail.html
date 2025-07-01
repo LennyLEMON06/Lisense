@@ -1,21 +1,38 @@
 <!-- licen/templates/licen/city_detail.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Детали города</h2>
-    <dl class="row">
-        <dt class="col-sm-3">ID:</dt>
-        <dd class="col-sm-9">#{{ city.id }}</dd>
-        <dt class="col-sm-3">Название:</dt>
-        <dd class="col-sm-9">{{ city.name }}</dd>
-    </dl>
+<div class="container mt-4">
+    <h2 class="mb-4">Детали города</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID:</dt>
+                <dd class="col-sm-9">#{{ city.id }}</dd>
+                
+                <dt class="col-sm-3">Название:</dt>
+                <dd class="col-sm-9">{{ city.name }}</dd>
+            </dl>
+        </div>
+    </div>
+    
+    <div class="d-flex flex-wrap gap-3 mb-4">
+        <a href="{% url 'city-update' city.id %}" class="btn btn-warning">Редактировать</a>
+        <a href="{% url 'city-delete' city.id %}" class="btn btn-danger">Удалить</a>
+        <a href="{% url 'city-list' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
 
     <!-- Кнопка добавления сети -->
-    <a href="{% url 'legal-entity-create-for-city' city.id %}" class="btn btn-success mb-4">+ Добавить сеть</a>
+    <div class="mb-4">
+        <a href="{% url 'legal-entity-create-for-city' city.id %}" class="btn btn-success">+ Добавить сеть</a>
+    </div>
 
     {% if legal_entities %}
-    <h4>Сети</h4>
-    <div class="table-responsive d-none d-md-block">
+    <div class="mb-3">
+        <h4>Сети</h4>
+    </div>
+    
+    <div class="table-responsive d-none d-md-block mb-4">
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
@@ -34,9 +51,11 @@
                     <td>{{ entity.inn }}</td>
                     <td>{{ entity.comments|truncatechars:50 }}</td>
                     <td class="text-nowrap">
-                        <a href="{% url 'legal-entity-detail' entity.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'legal-entity-update' entity.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'legal-entity-delete' entity.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'legal-entity-detail' entity.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'legal-entity-update' entity.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'legal-entity-delete' entity.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -49,27 +68,31 @@
         {% for entity in legal_entities %}
         <div class="card shadow-sm border mb-3">
             <div class="card-body">
-                <p><strong>ID:</strong> {{ entity.id }}</p>
-                <p><strong>Название:</strong> <a href="{% url 'legal-entity-detail' entity.id %}">{{ entity.name }}</a></p>
-                <p><strong>ИНН:</strong> {{ entity.inn }}</p>
-                <p><strong>Комментарии:</strong> {{ entity.comments|truncatechars:50 }}</p>
-                <td class="text-nowrap">
-                        <a href="{% url 'legal-entity-detail' entity.id %}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'legal-entity-update' entity.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'legal-entity-delete' entity.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
+                <div class="mb-2">
+                    <strong>ID:</strong> {{ entity.id }}
+                </div>
+                <div class="mb-2">
+                    <strong>Название:</strong> <a href="{% url 'legal-entity-detail' entity.id %}">{{ entity.name }}</a>
+                </div>
+                <div class="mb-2">
+                    <strong>ИНН:</strong> {{ entity.inn }}
+                </div>
+                <div class="mb-3">
+                    <strong>Комментарии:</strong> {{ entity.comments|truncatechars:50 }}
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'legal-entity-detail' entity.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                    <a href="{% url 'legal-entity-update' entity.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'legal-entity-delete' entity.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p class="text-muted">В этом городе пока нет сетей.</p>
-    {% endif %}
-
-    <div class="mt-4">
-        <a href="{% url 'city-update' city.id %}" class="btn btn-warning">Редактировать</a>
-        <a href="{% url 'city-delete' city.id %}" class="btn btn-danger">Удалить</a>
-        <a href="{% url 'city-list' %}" class="btn btn-secondary">Назад к списку</a>
+    <div class="alert alert-info">
+        В этом городе пока нет сетей.
     </div>
+    {% endif %}
 </div>
 {% endblock %}

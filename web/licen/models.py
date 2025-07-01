@@ -399,6 +399,8 @@ class WiFi(TimestampModel):
 class Computer(TimestampModel):
     name = models.CharField(max_length=100, verbose_name=_('Имя компьютера'))
     mac_address = models.CharField(
+        blank=True,
+        null=True,
         max_length=17,
         validators=[RegexValidator(
             regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
@@ -407,6 +409,8 @@ class Computer(TimestampModel):
         verbose_name=_('MAC-адрес')
     )
     ipv4_address = models.GenericIPAddressField(
+        blank=True,
+        null=True,
         protocol='IPv4',
         verbose_name=_('IPv4 адрес')
     )
@@ -431,7 +435,6 @@ class Computer(TimestampModel):
 class FiscalNumber(LicenseBaseModel):
     model = models.CharField(
         max_length=100,
-        unique=True,
         verbose_name=_('Модель')
     )
     zn = models.CharField(
@@ -461,7 +464,8 @@ class FiscalNumber(LicenseBaseModel):
 class CryptoPro(LicenseBaseModel):
     key = models.CharField(
         max_length=100,
-        unique=True,
+        blank=True,
+        null=True,
         verbose_name=_('Ключ')
     )
 
@@ -485,7 +489,8 @@ class ECP(LicenseBaseModel):
 class UTMRSAKeys(LicenseBaseModel):
     key = models.CharField(
         max_length=100,
-        unique=True,
+        blank=True,
+        null=True,
         verbose_name=_('Ключ')
     )
 
@@ -499,7 +504,8 @@ class UTMRSAKeys(LicenseBaseModel):
 class MCD(LicenseBaseModel):
     mcd_id = models.CharField(
         max_length=100,
-        unique=True,
+        blank=True,
+        null=True,
         verbose_name=_('ID')
     )
 
@@ -513,7 +519,8 @@ class MCD(LicenseBaseModel):
 class USAIS(LicenseBaseModel):
     key = models.CharField(
         max_length=100,
-        unique=True, 
+        blank=True,
+        null=True,
         verbose_name=_('Ключ')
     )
 
@@ -527,7 +534,6 @@ class USAIS(LicenseBaseModel):
 class HonestSign(LicenseBaseModel):
     key = models.CharField(
         max_length=100,
-        unique=True,
         blank=True,
         null=True,
         verbose_name=_('Ключ')
@@ -543,7 +549,8 @@ class HonestSign(LicenseBaseModel):
 class OFD(LicenseBaseModel):
     reg_number = models.CharField(
         max_length=100,
-        unique=True,
+        blank=True,
+        null=True,
         verbose_name=_('Регистрационный номер')
     )
 
