@@ -29,8 +29,8 @@ def send_license_notification(notification, user):
         'address': address.address if address else '',
         'legal_entity': legal_entity.name if legal_entity else '',
         'network': network.name if network else '',
-        'city': city.name if city else '',
-        'detail_url': f"http://localhost:8000/licenses/{notification.license_type}/{notification.license_id}/"
+        'city': city.name if city else '', 
+        'detail_url': f"http://38.180.146.160/licenses/{notification.license_type}/{notification.license_id}/"
     }
 
     # ВАЖНО: НЕ используем переменную notification в шаблоне больше!

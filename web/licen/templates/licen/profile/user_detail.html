@@ -2,29 +2,181 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Детали пользователя</h2>
-    <dl class="row">
-        <dt class="col-sm-3">Имя пользователя:</dt>
-        <dd class="col-sm-9">{{ user.username }}</dd>
-
-        <dt class="col-sm-3">Email:</dt>
-        <dd class="col-sm-9">{{ user.email }}</dd>
-
-        <dt class="col-sm-3">Роль:</dt>
-        <dd class="col-sm-9">{{ profile.get_role_display }}</dd>
-
-        <dt class="col-sm-3">Телефон:</dt>
-        <dd class="col-sm-9">{{ profile.phone|default:"—" }}</dd>
-
-        <dt class="col-sm-3">Отдел:</dt>
-        <dd class="col-sm-9">{{ profile.department|default:"—" }}</dd>
-    </dl>
-
-    <div class="mt-4">
-        <a href="{% url 'user-update' user.id %}" class="btn btn-warning">Редактировать</a>
-        <a href="{% url 'user-delete' user.id %}" class="btn btn-danger">Удалить</a>
-        <a href="{% url 'profile' %}" class="btn btn-secondary">Назад к списку</a>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card profile-detail-card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="bi bi-person-badge me-2"></i>Профиль пользователя
+                        </h3>
+                        <div class="badge bg-{% if profile.role == 'admin' %}danger{% else %}info{% endif %} fs-6">
+                            {{ profile.get_role_display }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-3 text-center">
+                            <div class="avatar-circle-lg bg-secondary mb-3">
+                                <span class="avatar-initials-lg">{{ user.username|first|upper }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h2 class="mb-1">{{ user.username }}</h2>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-building me-2"></i>{{ profile.department|default:"Отдел не указан" }}
+                            </p>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <a href="mailto:{{ user.email }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-envelope"></i> {{ user.email }}
+                                </a>
+                                {% if profile.phone %}
+                                <a href="tel:{{ profile.phone }}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-telephone"></i> {{ profile.phone }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3 text-primary">
+                                <i class="bi bi-info-circle"></i> Основная информация
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 ps-0">
+                                    <span><i class="bi bi-person me-2 text-muted"></i>Имя пользователя</span>
+                                    <span class="fw-bold">{{ user.username }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 ps-0">
+                                    <span><i class="bi bi-shield me-2 text-muted"></i>Уровень доступа</span>
+                                    <span class="badge bg-{% if profile.role == 'admin' %}danger{% else %}info{% endif %}">
+                                        {{ profile.get_role_display }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="mb-3 text-primary">
+                                <i class="bi bi-gear"></i> Контактные данные
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 ps-0">
+                                    <span><i class="bi bi-envelope me-2 text-muted"></i>Email</span>
+                                    <span class="fw-bold">{{ user.email }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 ps-0">
+                                    <span><i class="bi bi-phone me-2 text-muted"></i>Телефон</span>
+                                    <span class="fw-bold">{{ profile.phone|default:"—" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {% if user.license_set.all %}
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3 text-primary">
+                        <i class="bi bi-credit-card"></i> Связанные лицензии
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Тип лицензии</th>
+                                    <th>Ключ</th>
+                                    <th>Статус</th>
+                                    <th>Истекает</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for license in user.license_set.all %}
+                                <tr>
+                                    <td>{{ license.license_type }}</td>
+                                    <td><code>{{ license.key|truncatechars:12 }}</code></td>
+                                    <td>
+                                        <span class="badge bg-{% if license.is_active %}success{% else %}secondary{% endif %}">
+                                            {% if license.is_active %}Активна{% else %}Неактивна{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ license.expiration_date|date:"d.m.Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-light border-0 py-3">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Назад к списку
+                        </a>
+                        <div>
+                            <a href="{% url 'user-update' user.id %}" class="btn btn-warning me-2">
+                                <i class="bi bi-pencil"></i> Редактировать
+                            </a>
+                            <a href="{% url 'user-delete' user.id %}" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Удалить
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .profile-detail-card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .avatar-circle-lg {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .avatar-initials-lg {
+        font-weight: bold;
+    }
+    
+    .list-group-item {
+        padding: 0.75rem 0;
+    }
+    
+    @media (max-width: 768px) {
+        .avatar-circle-lg {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+        
+        .card-footer .btn {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+        
+        .card-footer div {
+            width: 100%;
+            flex-direction: column;
+        }
+    }
+</style>
 {% endblock %}

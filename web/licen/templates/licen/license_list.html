@@ -7,43 +7,24 @@
 <div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white border-bottom-0 pb-0 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                    <h2 class="h4 mb-3 mb-md-0 fw-bold text-primary">
-                        <i class="ri-key-2-line me-2"></i>Управление уевдомлениями
-                    </h2>
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <a href="{% url 'license-select-type' %}" class="btn btn-primary btn-sm">
-                            <i class="ri-add-line me-1"></i>Добавить лицензию
-                        </a>
-                        <div class="dropdown position-static"> <!-- Добавлен position-static -->
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ri-filter-2-line me-1"></i>Фильтры
-                                {% if request.GET.filter %} <span class="badge bg-primary ms-1">{{ request.GET.filter|title }}</span> {% endif %}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'all' or not request.GET.filter %}active{% endif %}" href="?filter=all">
-                                    Все лицензии
-                                    {% if request.GET.filter == 'all' or not request.GET.filter %}<i class="ri-check-line"></i>{% endif %}
-                                </a></li>
-                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'active' %}active{% endif %}" href="?filter=active">
-                                    Активные
-                                    {% if request.GET.filter == 'active' %}<i class="ri-check-line"></i>{% endif %}
-                                </a></li>
-                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expired' %}active{% endif %}" href="?filter=expired">
-                                    Истёкшие
-                                    {% if request.GET.filter == 'expired' %}<i class="ri-check-line"></i>{% endif %}
-                                </a></li>
-                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expiring_30' %}active{% endif %}" href="?filter=expiring_30">
-                                    Истекают через 30 дней
-                                    {% if request.GET.filter == 'expiring_30' %}<i class="ri-check-line"></i>{% endif %}
-                                </a></li>
-                                <li><a class="dropdown-item d-flex justify-content-between align-items-center {% if request.GET.filter == 'expiring_7' %}active{% endif %}" href="?filter=expiring_7">
-                                    Истекают через 7 дней
-                                    {% if request.GET.filter == 'expiring_7' %}<i class="ri-check-line"></i>{% endif %}
-                                </a></li>
-                            </ul>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pb-0 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <div class="icon-shape icon-shape-primary rounded-3 me-3">
+                            <i class="bi bi-bell-fill"></i>
                         </div>
+                        <div>
+                            {% if profile.role == 'admin' %}
+                                <h2 class="mb-0 fw-bold">Управление уведомлениями</h2>
+                            {% else %}
+                                <h2 class="mb-0 fw-bold">Уведомления</h2>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'license-select-type' %}" class="btn btn-primary">
+                            <i class="ri-add-line me-2"></i>Добавить лицензию
+                        </a>
                     </div>
                 </div>
             </div>
@@ -52,129 +33,90 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0 overflow-hidden">
                 <div class="card-body p-0">
                     {% if licenses %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-borderless table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
                                     <th class="ps-4">Тип лицензии</th>
                                     <th>ID</th>
                                     <th>Статус</th>
                                     <th>Дата окончания</th>
-                                    <th class="text-end pe-4">Действия</th>
+                                    <th>Осталось</th>
+                                    <th class="pe-4">Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in licenses %}
-                                <tr class="{% if item.object.end_date|timesince_days <= 0 %}table-danger{% elif item.object.end_date|timesince_days <= 7 %}table-warning{% elif item.object.end_date|timesince_days <= 30 %}table-info{% endif %}">
+                                {% with item.object.end_date|timesince_days as days_left %}
+                                {% if days_left <= 30 %}
+                                <tr class="license-row {% if days_left <= 0 %}license-expired{% elif days_left <= 7 %}license-warning{% else %}license-info{% endif %}">
                                     <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="ri-{{ item.icon|default:'key-2-line' }} fs-5 text-{{ item.color|default:'primary' }}"></i>
-                                            <span class="fw-medium">{{ item.verbose_name }}</span>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="icon-shape icon-shape-{{ item.color|default:'primary' }} rounded-2">
+                                                <i class="ri-{{ item.icon|default:'key-2-line' }}"></i>
+                                                <i class="bi bi-key-fill"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-semibold">{{ item.verbose_name }}</h6>
+                                                <small class="text-muted">{{ item.object.software.name|default:"Не указано" }}</small>
+                                            </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{% url 'license-detail' item.type item.id %}" class="text-decoration-none">
+                                        <a href="{% url 'license-detail' item.type item.id %}" class="text-decoration-none fw-semibold">
                                             #{{ item.object.id }}
                                         </a>
                                     </td>
                                     <td>
-                                        {% with item.object.end_date|timesince_days as days_left %}
-                                            {% if days_left <= 0 %}
-                                                <span class="badge bg-danger">Истёк срок</span>
-                                            {% elif days_left <= 7 %}
-                                                <span class="badge bg-warning text-dark">Скоро истекает ({{ days_left }} дн.)</span>
-                                            {% elif days_left <= 30 %}
-                                                <span class="badge bg-info">Истекает ({{ days_left }} дн.)</span>
-                                            {% else %}
-                                                <span class="badge bg-success">Активна ({{ days_left }} дн.)</span>
-                                            {% endif %}
-                                        {% endwith %}
+                                        {% if days_left <= 0 %}
+                                            <span class="badge bg-danger-light text-danger">Истёк срок</span>
+                                        {% elif days_left <= 7 %}
+                                            <span class="badge bg-warning-light text-warning">Срочно</span>
+                                        {% else %}
+                                            <span class="badge bg-info-light text-info">Истекает</span>
+                                        {% endif %}
                                     </td>
-                                    <td>{{ item.object.end_date|date:"d.m.Y" }}</td>
-                                    <td class="text-end pe-4">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                <i class="ri-more-2-line"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <a class="dropdown-item" href="{% url 'license-detail' item.type item.id %}">
-                                                        <i class="ri-eye-line me-2"></i>Просмотр
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    {% comment %} <a class="dropdown-item" href="{% url 'license-edit' item.type item.id %}"> {% endcomment %}
-                                                        <i class="ri-edit-line me-2"></i>Редактировать
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    {% comment %} <a class="dropdown-item text-danger" href="{% url 'license-delete' item.type item.id %}"> {% endcomment %}
-                                                        <i class="ri-delete-bin-line me-2"></i>Удалить
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                    <td class="fw-medium">{{ item.object.end_date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if days_left <= 0 %}
+                                            <span class="text-danger">Истек</span>
+                                        {% else %}
+                                            <span class="fw-semibold">{{ days_left }} дн.</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4">
+                                        <div class="btn-group">
+                                            <a href="{% url 'license-detail' item.type item.id %}" class="btn btn-sm btn-outline-info me-1" title="Просмотр">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% endwith %}
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     {% else %}
                     <div class="text-center py-5">
-                        <img src="{% static 'images/no-data.svg' %}" alt="No data" class="img-fluid mb-4" style="max-height: 200px;">
-                        <h5 class="text-muted mb-3">Лицензии не найдены</h5>
-                        <a href="{% url 'license-select-type' %}" class="btn btn-primary">
-                            <i class="ri-add-line me-1"></i>Добавить первую лицензию
+                        <div class="mb-4">
+                            <img src="{% static 'images/no-notifications.svg' %}" alt="No notifications" style="max-height: 180px;">
+                        </div>
+                        <h4 class="fw-semibold mb-3">Нет активных уведомлений</h4>
+                        <p class="text-muted mb-4">Все лицензии действительны более 30 дней</p>
+                        <a href="{% url 'license-select-type' %}" class="btn btn-primary px-4">
+                            <i class="ri-add-line me-2"></i>Добавить лицензию
                         </a>
                     </div>
                     {% endif %}
                 </div>
-
-                {% if is_paginated %}
-                <div class="card-footer bg-white border-top-0">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center mb-0">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1" aria-label="First">
-                                        <span aria-hidden="true">&laquo;&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                                        <span aria-hidden="true">&raquo;&raquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -183,25 +125,103 @@
 
 {% block css %}
 <style>
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.05) !important;
+    .icon-shape {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    .table-info, .table-info > td {
-        background-color: rgba(23, 162, 184, 0.1) !important;
+    .icon-shape-primary {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
     }
     
-    .table-warning, .table-warning > td {
-        background-color: rgba(255, 193, 7, 0.1) !important;
+    .icon-shape-success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
     }
     
-    .table-danger, .table-danger > td {
-        background-color: rgba(220, 53, 69, 0.1) !important;
+    .icon-shape-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .icon-shape-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .icon-shape-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
+    
+    .license-row {
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    
+    .license-row:hover {
+        background-color: rgba(13, 110, 253, 0.03) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    
+    .license-expired {
+        border-left-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.03);
+    }
+    
+    .license-warning {
+        border-left-color: #ffc107;
+        background-color: rgba(255, 193, 7, 0.03);
+    }
+    
+    .license-info {
+        border-left-color: #0dcaf0;
+        background-color: rgba(13, 202, 240, 0.03);
     }
     
     .badge {
         font-weight: 500;
         padding: 0.35em 0.65em;
+        font-size: 0.75em;
+    }
+    
+    .bg-danger-light {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+    
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+    
+    .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+    }
+    
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    .table-borderless td, .table-borderless th {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .btn-outline-dark {
+        color: #212529;
+        border-color: #dee2e6;
+    }
+    
+    .btn-outline-dark:hover {
+        background-color: #212529;
+        border-color: #212529;
+    }
+    
+    .btn-outline-danger {
+        border-color: #dee2e6;
     }
 </style>
 {% endblock %}

@@ -38,7 +38,6 @@
                 <tr>
                     <th>ID</th>
                     <th>Название</th>
-                    <th>ИНН</th>
                     <th>Комментарии</th>
                     <th>Действия</th>
                 </tr>
@@ -48,7 +47,6 @@
                 <tr>
                     <td>{{ entity.id }}</td>
                     <td><a href="{% url 'legal-entity-detail' entity.id %}">{{ entity.name }}</a></td>
-                    <td>{{ entity.inn }}</td>
                     <td>{{ entity.comments|truncatechars:50 }}</td>
                     <td class="text-nowrap">
                         <div class="d-flex gap-2">

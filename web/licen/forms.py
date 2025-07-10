@@ -8,6 +8,7 @@ from .models import (
 )
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm, UsernameField
 
 from django.utils.translation import gettext_lazy as _
 
@@ -18,17 +19,34 @@ class RegisterForm(UserCreationForm):
         help_text=_('Обязательно. Например: user@example.com')
     )
 
+    username = UsernameField(
+        label="Имя пользователя",
+        help_text="Обязательное поле. Только латинские буквы, цифры и символы: @/./+/-/_"
+    )
+
     class Meta:
         model = User
         fields = ["username", "email", "password1", "password2"]
         help_texts = {
-            'username': _('Не более 150 символов. Только буквы, цифры и @/./+/-/_'),
+            'username': _('Не более 150 символов. Только латинские буквы, цифры и символы (@, ., +, -, _).'),
         }
         error_messages = {
             'username': {
                 'unique': _('Пользователь с таким именем уже существует')
             }
         }
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if not username:
+            return username
+
+        # Проверяем, есть ли в имени русские буквы
+        cyrillic_chars = set('абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
+        if any(char.lower() in cyrillic_chars for char in username):
+            raise forms.ValidationError("Имя пользователя не должно содержать русские буквы.")
+
+        return username
 
     def __init__(self, *args, **kwargs):
         super(RegisterForm, self).__init__(*args, **kwargs)
@@ -40,6 +58,11 @@ class RegisterForm(UserCreationForm):
         self.fields['password2'].help_text = _('Повторите пароль')
 
 class UserForm(forms.ModelForm):
+    username = forms.CharField(
+        label="Имя пользователя",
+        help_text="Только латинские буквы, цифры и символы: @/./+/-/_"
+    )
+
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
@@ -55,6 +78,17 @@ class UserForm(forms.ModelForm):
                 'unique': _('Этот email уже используется')
             }
         }
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if not username:
+            return username
+
+        cyrillic_chars = set('абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
+        if any(char.lower() in cyrillic_chars for char in username):
+            raise forms.ValidationError("Имя пользователя не должно содержать русские буквы.")
+
+        return username
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
@@ -604,6 +638,16 @@ class PersonalAccountMobileOperatorForm(forms.ModelForm):
                 'unique': _('Логин уже используется')
             }
         }
+
+    def clean_login(self):
+        login = self.cleaned_data.get("login")
+        if not login:
+            return login
+
+        cyrillic_chars = set('абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
+        if any(char.lower() in cyrillic_chars for char in login):
+            raise forms.ValidationError("Логин не должен содержать русские буквы.")
+        return login
 
 
 # === Личный кабинет интернет-провайдера ===

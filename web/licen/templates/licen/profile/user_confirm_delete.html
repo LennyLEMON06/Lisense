@@ -2,13 +2,61 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Подтверждение удаления</h2>
-    <p>Вы действительно хотите удалить пользователя «{{ user.username }}»?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Удалить</button>
-        <a href="{% url 'profile' %}" class="btn btn-secondary">Отмена</a>
-    </form>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white py-3">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Подтверждение удаления
+                    </h2>
+                </div>
+                
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-person-x-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    
+                    <h3 class="h5 mb-3">Вы уверены, что хотите удалить пользователя?</h3>
+                    
+                    <div class="alert alert-danger d-flex align-items-center">
+                        <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                        <div>
+                            Будет удален аккаунт: <strong>{{ user.username }}</strong>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted">Это действие нельзя будет отменить. Все данные пользователя будут безвозвратно удалены.</p>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-secondary flex-grow-1">
+                                <i class="bi bi-arrow-left"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-danger flex-grow-1">
+                                <i class="bi bi-trash-fill"></i> Удалить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        border-width: 2px;
+    }
+    
+    @media (max-width: 576px) {
+        .flex-grow-1 {
+            flex-grow: 1 !important;
+        }
+    }
+</style>
 {% endblock %}

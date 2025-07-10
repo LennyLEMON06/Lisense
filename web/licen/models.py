@@ -566,8 +566,10 @@ class RemoteAccess(TimestampModel):
         TEAMVIEWER = 'teamviewer', _('TeamViewer')
         ANYDESK = 'anydesk', _('AnyDesk')
         RDP = 'rdp', _('Remote Desktop')
+        RUSTDESK = 'rustdesk', _('RustDesk')
+        AWESUN = 'awesun', _('AweSun')
         OTHER = 'other', _('Другое')
-
+        
     name = models.CharField(
         max_length=100,
         choices=AccessType.choices,

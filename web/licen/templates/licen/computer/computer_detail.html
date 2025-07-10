@@ -131,6 +131,77 @@
         {% endif %}
     </div>
 
+    <!-- Секция удалённого доступа -->
+    <div class="section-block mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Удалённый доступ</h4>
+            <a href="{% url 'remote-access-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+        </div>
+        
+        {% if remote_accesses %}
+        <div class="table-responsive d-none d-md-block mb-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Тип</th>
+                        <th>Адрес</th>
+                        <th>Пароль</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for access in remote_accesses %}
+                    <tr>
+                        <td>{{ access.id }}</td>
+                        <td>{{ access.get_name_display }}</td>
+                        <td><a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a></td>
+                        <td>{{ access.password|default:"—" }}</td>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-md-none">
+            {% for access in remote_accesses %}
+            <div class="card shadow-sm border mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>ID:</strong> {{ access.id }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Тип:</strong> {{ access.get_name_display }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Адрес:</strong> <a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Пароль:</strong> {{ access.password|default:"—" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Нет удалённого доступа
+        </div>
+        {% endif %}
+    </div>
+
     <!-- Секция CryptoPro -->
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -589,77 +660,6 @@
         {% else %}
         <div class="alert alert-info mb-0">
             Нет лицензии ОФД
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Секция удалённого доступа -->
-    <div class="section-block">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4>Удалённый доступ</h4>
-            <a href="{% url 'remote-access-create-for-computer' computer.id %}" class="btn btn-success btn-sm">+ Добавить</a>
-        </div>
-        
-        {% if remote_accesses %}
-        <div class="table-responsive d-none d-md-block mb-3">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Тип</th>
-                        <th>Адрес</th>
-                        <th>Пароль</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for access in remote_accesses %}
-                    <tr>
-                        <td>{{ access.id }}</td>
-                        <td>{{ access.get_name_display }}</td>
-                        <td><a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a></td>
-                        <td>{{ access.password|default:"—" }}</td>
-                        <td class="text-nowrap">
-                            <div class="d-flex gap-2">
-                                <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="d-md-none">
-            {% for access in remote_accesses %}
-            <div class="card shadow-sm border mb-3">
-                <div class="card-body">
-                    <div class="mb-2">
-                        <strong>ID:</strong> {{ access.id }}
-                    </div>
-                    <div class="mb-2">
-                        <strong>Тип:</strong> {{ access.get_name_display }}
-                    </div>
-                    <div class="mb-2">
-                        <strong>Адрес:</strong> <a href="{% url 'remote-access-detail' access.id %}">{{ access.access_id }}</a>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Пароль:</strong> {{ access.password|default:"—" }}
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'remote-access-detail' access.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                        <a href="{% url 'remote-access-update' access.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                        <a href="{% url 'remote-access-delete' access.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="alert alert-info mb-0">
-            Нет удалённого доступа
         </div>
         {% endif %}
     </div>

@@ -19,8 +19,11 @@ from django.contrib.auth.decorators import login_required
 from licen.models import UserProfile, LicenseNotification, User
 from licen.tasks import check_license_expirations
 from django.contrib.auth import logout
+from licen.decorators import role_required
 
-
+admin = UserProfile.Role.ADMIN
+bookkeeper = UserProfile.Role.MODERATOR
+user = UserProfile.Role.JOURNALIST
 
 def login_view(request):
     # ✅ Если пользователь уже авторизован — сразу редирект
@@ -59,7 +62,6 @@ def custom_logout(request):
     logout(request)
     return redirect('login')
 
-
 @login_required
 def profile_view(request):
     user = request.user
@@ -92,6 +94,7 @@ def profile_view(request):
         'title': f"Профиль: {user.username}"
     })
 
+@role_required(admin)
 @login_required
 def user_detail(request, pk):
     user = get_object_or_404(User, id=pk)
@@ -102,7 +105,7 @@ def user_detail(request, pk):
         'title': f"Профиль пользователя: {user.username}"
     })
 
-
+@role_required(admin)
 @login_required
 def user_update(request, pk):
     user = get_object_or_404(User, id=pk)
@@ -125,7 +128,7 @@ def user_update(request, pk):
         'title': f"Редактировать профиль {user.username}",
     })
 
-
+@role_required(admin)
 @login_required
 def user_delete(request, pk):
     user = get_object_or_404(User, id=pk)
@@ -339,6 +342,7 @@ def city_detail(request, pk):
         'legal_entities': legal_entities
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def legal_entity_create_for_city(request, city_id):
     city = get_object_or_404(City, id=city_id)
@@ -359,6 +363,7 @@ def legal_entity_create_for_city(request, city_id):
         'title': f"Добавить юридическое лицо для города «{city.name}»"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def city_create(request):
     if request.method == 'POST':
@@ -374,6 +379,7 @@ def city_create(request):
         'title': 'Добавить город'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def city_update(request, pk):
     city = get_object_or_404(City, pk=pk)
@@ -391,6 +397,7 @@ def city_update(request, pk):
         'title': f"Редактировать {city.name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def city_delete(request, pk):
     city = get_object_or_404(City, pk=pk)
@@ -420,6 +427,7 @@ def contact_person_detail(request, pk):
         'title': f"Контактное лицо: {person.full_name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def contact_person_create(request):
     if request.method == 'POST':
@@ -435,6 +443,7 @@ def contact_person_create(request):
         'title': 'Добавить контактное лицо'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def contact_person_update(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
@@ -452,6 +461,7 @@ def contact_person_update(request, pk):
         'title': f"Редактировать: {person.full_name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def contact_person_delete(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
@@ -482,6 +492,7 @@ def legal_entity_detail(request, pk):
         'title': f"Сеть: {legal_entity.name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def network_create_for_legal_entity(request, legal_entity_id):
     legal_entity = get_object_or_404(LegalEntity, id=legal_entity_id)
@@ -511,6 +522,7 @@ def legal_entity_list_for_network(request, network_id):
         'network': network
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def legal_entity_create(request):
     if request.method == 'POST':
@@ -526,6 +538,7 @@ def legal_entity_create(request):
         'title': 'Добавить сеть'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def legal_entity_update(request, pk):
     legal_entity = get_object_or_404(LegalEntity, pk=pk)
@@ -545,6 +558,7 @@ def legal_entity_update(request, pk):
         'title': f"Редактировать {legal_entity.name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def legal_entity_delete(request, pk):
     legal_entity = get_object_or_404(LegalEntity, pk=pk)
@@ -577,6 +591,7 @@ def network_detail(request, pk):
         'title': f"Юридическое лицо: {network.name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def address_create_for_network(request, network_id):
     from licen.models import Network, Address
@@ -606,6 +621,7 @@ def network_list_for_city(request, city_id):
     networks = Network.objects.filter(legal_entity__city=city)
     return render(request, 'licen/network/network_list_for_city.html', {'networks': networks, 'city': city})
 
+@role_required(admin, bookkeeper)
 @login_required
 def network_create(request):
     if request.method == 'POST':
@@ -621,6 +637,7 @@ def network_create(request):
         'title': 'Добавить юридическое лицо'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def network_update(request, pk):
     network = get_object_or_404(Network, pk=pk)
@@ -640,6 +657,7 @@ def network_update(request, pk):
         'title': f"Редактировать {network.name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def network_delete(request, pk):
     network = get_object_or_404(Network, pk=pk)
@@ -662,32 +680,23 @@ def address_list(request):
 @login_required
 def address_detail(request, pk):
     address = get_object_or_404(Address, id=pk)
-
-    # Получаем связанные объекты
-    mobile_operator = MobileOperator.objects.filter(address=address).first()
-    internet_provider = InternetProvider.objects.filter(address=address).first()
-    wifi = WiFi.objects.filter(address=address).first()
-    router_admin_panel = RouterAdminPanel.objects.filter(address=address).first()
-    computer = Computer.objects.filter(address=address).first()
-
-    personal_account_mobile = PersonalAccountMobileOperator.objects.filter(address=address).first()
-    personal_account_internet = PersonalAccountInternetProvider.objects.filter(address=address).first()
-
+    
     return render(request, 'licen/address/address_detail.html', {
         'address': address,
         'network': address.network,
         'legal_entity': address.network.legal_entity,
         'city': address.network.legal_entity.city,
-        'mobile_operator': mobile_operator,
-        'internet_provider': internet_provider,
-        'wifi': wifi,
-        'router_admin_panel': router_admin_panel,
-        'computer': computer,
-        'personal_account_mobile': personal_account_mobile,
-        'personal_account_internet': personal_account_internet,
+        'mobile_operators': MobileOperator.objects.filter(address=address),
+        'internet_providers': InternetProvider.objects.filter(address=address),
+        'wifis': WiFi.objects.filter(address=address),  # Убрали .first()
+        'router_admin_panels': RouterAdminPanel.objects.filter(address=address),
+        'computers': Computer.objects.filter(address=address),
+        'personal_accounts_mobile': PersonalAccountMobileOperator.objects.filter(address=address),
+        'personal_accounts_internet': PersonalAccountInternetProvider.objects.filter(address=address),
         'title': f"Адрес: {address.address}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mobile_operator_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -710,6 +719,7 @@ def mobile_operator_create_for_address(request, address_id):
 
 # licen/views.py
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_mobile_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -733,6 +743,7 @@ def personal_account_mobile_create_for_address(request, address_id):
 
 # licen/views.py
 
+@role_required(admin, bookkeeper)
 @login_required
 def internet_provider_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -755,6 +766,7 @@ def internet_provider_create_for_address(request, address_id):
 
 # licen/views.py
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_internet_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -775,6 +787,7 @@ def personal_account_internet_create_for_address(request, address_id):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def wifi_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -795,6 +808,7 @@ def wifi_create_for_address(request, address_id):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def router_admin_panel_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -815,6 +829,7 @@ def router_admin_panel_create_for_address(request, address_id):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def computer_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -835,6 +850,7 @@ def computer_create_for_address(request, address_id):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def address_create(request):
     if request.method == 'POST':
@@ -850,6 +866,7 @@ def address_create(request):
         'title': 'Добавить адрес'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def address_update(request, pk):
     address = get_object_or_404(Address, pk=pk)
@@ -869,6 +886,7 @@ def address_update(request, pk):
         'title': f"Редактировать {address.network}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def address_delete(request, pk):
     address = get_object_or_404(Address, pk=pk)
@@ -923,6 +941,7 @@ def computer_detail(request, pk):
         'city': computer.address.network.legal_entity.city,
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def fiscal_number_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -942,6 +961,7 @@ def fiscal_number_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def crypto_pro_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -962,6 +982,7 @@ def crypto_pro_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ecp_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -982,6 +1003,7 @@ def ecp_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def utm_rsa_keys_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1002,6 +1024,7 @@ def utm_rsa_keys_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mcd_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1022,6 +1045,7 @@ def mcd_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def honest_sign_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1042,6 +1066,7 @@ def honest_sign_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ofd_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1062,6 +1087,7 @@ def ofd_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def remote_access_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1082,6 +1108,7 @@ def remote_access_create_for_computer(request, computer_id):
         'computer': computer
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def computer_create(request):
     if request.method == 'POST':
@@ -1097,6 +1124,7 @@ def computer_create(request):
         'title': 'Добавить компьютер'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def computer_update(request, pk):
     computer = get_object_or_404(Computer, pk=pk)
@@ -1116,6 +1144,7 @@ def computer_update(request, pk):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def computer_delete(request, pk):
     computer = get_object_or_404(Computer, pk=pk)
@@ -1139,6 +1168,7 @@ def remote_access_detail(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
     return render(request, 'licen/remote_access/remote_access_detail.html', {'access': access})
 
+@role_required(admin, bookkeeper)
 @login_required
 def remote_access_create(request):
     if request.method == 'POST':
@@ -1154,6 +1184,7 @@ def remote_access_create(request):
         'title': 'Добавить удаленный доступ'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def remote_access_update(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
@@ -1173,6 +1204,7 @@ def remote_access_update(request, pk):
         'title': f"Редактировать {access.get_name_display()}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def remote_access_delete(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
@@ -1196,6 +1228,7 @@ def fiscal_number_detail_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
     return render(request, 'licen/fiscal_number/fiscal_number_detail.html', {'fiscal_number': fiscal_number})
 
+@role_required(admin, bookkeeper)
 @login_required
 def fiscal_number_create_one(request):
     if request.method == 'POST':
@@ -1211,6 +1244,7 @@ def fiscal_number_create_one(request):
         'title': 'Добавить ФН'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def fiscal_number_update_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
@@ -1230,6 +1264,7 @@ def fiscal_number_update_one(request, pk):
         'title': f"Редактировать {fiscal_number.model} ({fiscal_number.reg_number})"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def fiscal_number_delete_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
@@ -1254,6 +1289,7 @@ def crypto_pro_detail(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
     return render(request, 'licen/crypto_pro/crypto_pro_detail.html', {'crypto_pro': crypto_pro})
 
+@role_required(admin, bookkeeper)
 @login_required
 def crypto_pro_create(request):
     if request.method == 'POST':
@@ -1269,6 +1305,7 @@ def crypto_pro_create(request):
         'title': 'Добавить CryptoPro'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def crypto_pro_update(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
@@ -1288,6 +1325,7 @@ def crypto_pro_update(request, pk):
         'title': f"Редактировать {crypto_pro.key}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def crypto_pro_delete(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
@@ -1312,6 +1350,7 @@ def ecp_detail(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
     return render(request, 'licen/ecp/ecp_detail.html', {'ecp': ecp})
 
+@role_required(admin, bookkeeper)
 @login_required
 def ecp_create(request):
     if request.method == 'POST':
@@ -1327,6 +1366,7 @@ def ecp_create(request):
         'title': 'Добавить ЭЦП'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ecp_update(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
@@ -1346,6 +1386,7 @@ def ecp_update(request, pk):
         'title': f"Редактировать {ecp.full_name}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ecp_delete(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
@@ -1369,6 +1410,7 @@ def utmr_sakeys_detail(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_detail.html', {'key': key})
 
+@role_required(admin, bookkeeper)
 @login_required
 def utmr_sakeys_create(request):
     if request.method == 'POST':
@@ -1384,6 +1426,7 @@ def utmr_sakeys_create(request):
         'title': 'Добавить УТМ RSA Ключ'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def utmr_sakeys_update(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
@@ -1403,6 +1446,7 @@ def utmr_sakeys_update(request, pk):
         'title': f"Редактировать {key.key}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def utmr_sakeys_delete(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
@@ -1426,6 +1470,7 @@ def mcd_detail(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
     return render(request, 'licen/mcd/mcd_detail.html', {'mcd': mcd})
 
+@role_required(admin, bookkeeper)
 @login_required
 def mcd_create(request):
     if request.method == 'POST':
@@ -1441,6 +1486,7 @@ def mcd_create(request):
         'title': 'Добавить МЧД'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mcd_update(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
@@ -1460,6 +1506,7 @@ def mcd_update(request, pk):
         'title': f"Редактировать {mcd.mcd_id}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mcd_delete(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
@@ -1483,6 +1530,7 @@ def usa_is_detail(request, pk):
     license = get_object_or_404(USAIS, id=pk)
     return render(request, 'licen/usais/usais_detail.html', {'license': license})
 
+@role_required(admin, bookkeeper)
 @login_required
 def usa_is_create(request):
     if request.method == 'POST':
@@ -1498,6 +1546,7 @@ def usa_is_create(request):
         'title': 'Добавить лицензию ЕГАИС'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def usa_is_update(request, pk):
     license = get_object_or_404(USAIS, id=pk)
@@ -1517,6 +1566,7 @@ def usa_is_update(request, pk):
         'title': f"Редактировать {license.key}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def usa_is_delete(request, pk):
     license = get_object_or_404(USAIS, id=pk)
@@ -1529,6 +1579,7 @@ def usa_is_delete(request, pk):
         'object': license
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def usa_is_create_for_computer(request, computer_id):
     computer = get_object_or_404(Computer, id=computer_id)
@@ -1561,6 +1612,7 @@ def honest_sign_detail(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
     return render(request, 'licen/honest_sign/honest_sign_detail.html', {'sign': sign})
 
+@role_required(admin, bookkeeper)
 @login_required
 def honest_sign_create(request):
     if request.method == 'POST':
@@ -1576,6 +1628,7 @@ def honest_sign_create(request):
         'title': 'Добавить Честный знак'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def honest_sign_update(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
@@ -1595,6 +1648,7 @@ def honest_sign_update(request, pk):
         'title': f"Редактировать {sign.key}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def honest_sign_delete(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
@@ -1619,6 +1673,7 @@ def ofd_detail(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
     return render(request, 'licen/ofd/ofd_detail.html', {'ofd': ofd})
 
+@role_required(admin, bookkeeper)
 @login_required
 def ofd_create(request):
     if request.method == 'POST':
@@ -1634,6 +1689,7 @@ def ofd_create(request):
         'title': 'Добавить ОФД'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ofd_update(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
@@ -1653,6 +1709,7 @@ def ofd_update(request, pk):
         'title': f"Редактировать {ofd.reg_number}"
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def ofd_delete(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
@@ -1677,6 +1734,7 @@ def mobile_operator_detail(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
     return render(request, 'licen/mobile_operator/mobile_operator_detail.html', {'operator': operator})
 
+@role_required(admin, bookkeeper)
 @login_required
 def mobile_operator_create(request):
     if request.method == 'POST':
@@ -1692,6 +1750,7 @@ def mobile_operator_create(request):
         'title': 'Добавить мобильного оператора'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mobile_operator_update(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
@@ -1710,6 +1769,7 @@ def mobile_operator_update(request, pk):
         'address': operator.address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def mobile_operator_delete(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
@@ -1734,6 +1794,7 @@ def internet_provider_detail(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
     return render(request, 'licen/internet_provider/internet_provider_detail.html', {'provider': provider})
 
+@role_required(admin, bookkeeper)
 @login_required
 def internet_provider_create(request):
     if request.method == 'POST':
@@ -1749,6 +1810,7 @@ def internet_provider_create(request):
         'title': 'Добавить интернет-провайдера'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def internet_provider_update(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
@@ -1768,6 +1830,7 @@ def internet_provider_update(request, pk):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def internet_provider_delete(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
@@ -1792,6 +1855,7 @@ def wifi_detail(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
     return render(request, 'licen/wifi/wifi_detail.html', {'wifi': wifi})
 
+@role_required(admin, bookkeeper)
 @login_required
 def wifi_create(request):
     if request.method == 'POST':
@@ -1807,6 +1871,7 @@ def wifi_create(request):
         'title': 'Добавить WiFi'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def wifi_update(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
@@ -1826,6 +1891,7 @@ def wifi_update(request, pk):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def wifi_delete(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
@@ -1850,6 +1916,7 @@ def router_admin_panel_detail(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
     return render(request, 'licen/router_admin_panel/router_admin_panel_detail.html', {'panel': panel})
 
+@role_required(admin, bookkeeper)
 @login_required
 def router_admin_panel_create(request):
     if request.method == 'POST':
@@ -1865,6 +1932,7 @@ def router_admin_panel_create(request):
         'title': 'Добавить панель роутера'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def router_admin_panel_update(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
@@ -1884,6 +1952,7 @@ def router_admin_panel_update(request, pk):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def router_admin_panel_delete(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
@@ -1909,6 +1978,7 @@ def personal_account_internet_provider_detail(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_detail.html', {'account': account})
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_internet_provider_create(request):
     if request.method == 'POST':
@@ -1924,6 +1994,7 @@ def personal_account_internet_provider_create(request):
         'title': 'Добавить личный кабинет интернет-провайдера'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_internet_provider_update(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
@@ -1943,6 +2014,7 @@ def personal_account_internet_provider_update(request, pk):
         'address': address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_internet_provider_delete(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
@@ -1967,6 +2039,7 @@ def personal_account_mobile_operator_detail(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_detail.html', {'account': account})
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_mobile_operator_create(request):
     if request.method == 'POST':
@@ -1982,6 +2055,7 @@ def personal_account_mobile_operator_create(request):
         'title': 'Добавить личный кабинет мобильного оператора'
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_mobile_operator_update(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, id=pk)
@@ -2001,6 +2075,7 @@ def personal_account_mobile_operator_update(request, pk):
         'address': address  # ← Важно: передаём address
     })
 
+@role_required(admin, bookkeeper)
 @login_required
 def personal_account_mobile_operator_delete(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
@@ -2057,6 +2132,7 @@ def license_detail(request, license_type, license_id):
     }
     return render(request, 'licen/license_detail.html', context)
 
+@role_required(admin, bookkeeper)
 @login_required
 def license_create(request, license_type):
     from licen.models import LicenseBaseModel
