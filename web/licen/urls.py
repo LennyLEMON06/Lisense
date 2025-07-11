@@ -24,7 +24,9 @@ from .views import (
     login_view,
     custom_logout,
     register_view,
-    
+    password_reset_request,
+    password_reset_confirm,
+    password_reset_done,
 
     profile_view,
     user_detail,
@@ -37,6 +39,7 @@ from .views import (
 
     license_list, 
     license_detail,
+    license_delete,
     license_create,
     license_select_type,
 
@@ -204,6 +207,10 @@ urlpatterns = [
     path('profile/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('users/<int:user_id>/change-password/', ChangePasswordView.as_view(), name='change-user-password'),
 
+    path('password-reset/', password_reset_request, name='password_reset'),
+    path('password-reset-confirm/<uidb64>/<token>/', password_reset_confirm, name='password_reset_confirm'),
+    path('password-reset-done/', password_reset_done, name='password_reset_done'),
+
     # Юрлица
     path('cities/<int:city_id>/add_legal_entity/', LegalEntityCreateView.as_view(), name='legal-entity-create'),
 
@@ -311,6 +318,7 @@ urlpatterns = [
     path('licenses/<str:license_type>/', license_list, name='license-list-by-type'),
     path('licenses/<str:license_type>/<int:license_id>/', license_detail, name='license-detail'),
     path('licenses/<str:license_type>/new/', license_create, name='license-create'),
+    path('licenses/<str:license_type>/<int:license_id>/delete/', license_delete, name='license-delete'),
     path('select-type/', license_select_type, name='license-select-type'),
 
     # CryptoPro

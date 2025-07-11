@@ -20,6 +20,12 @@ from licen.models import UserProfile, LicenseNotification, User
 from licen.tasks import check_license_expirations
 from django.contrib.auth import logout
 from licen.decorators import role_required
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib.auth.forms import SetPasswordForm
 
 admin = UserProfile.Role.ADMIN
 bookkeeper = UserProfile.Role.MODERATOR
@@ -61,6 +67,57 @@ def register_view(request):
 def custom_logout(request):
     logout(request)
     return redirect('login')
+
+def password_reset_done(request):
+    return render(request, 'licen/log/password_reset_done.html', {
+        'title': 'Письмо отправлено'
+    })
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        username_or_email = request.POST.get('username_or_email')
+        associated_users = User.objects.filter(username=username_or_email) or User.objects.filter(email=username_or_email)
+        
+        if associated_users.exists():
+            for user in associated_users:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                reset_link = request.build_absolute_uri(
+                    reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+                )
+
+                subject = "Сброс пароля"
+                message = render_to_string('licen/log/password_reset_email.html', {
+                    'user': user,
+                    'reset_link': reset_link,
+                })
+                plain_message = f"Перейдите по ссылке: {reset_link}"
+
+                send_mail(subject, plain_message, 'ksenia.boul@yandex.ru', [user.email], html_message=message)
+
+        return redirect('password_reset_done')
+
+    return render(request, 'licen/log/password_reset_form.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('login')
+        else:
+            form = SetPasswordForm(user)
+        return render(request, 'licen/log/password_reset_confirm.html', {'form': form})
+    else:
+        return render(request, 'licen/log/password_reset_invalid.html')
 
 @login_required
 def profile_view(request):
@@ -696,7 +753,7 @@ def address_detail(request, pk):
         'title': f"Адрес: {address.address}"
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def mobile_operator_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -719,7 +776,7 @@ def mobile_operator_create_for_address(request, address_id):
 
 # licen/views.py
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_mobile_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -743,7 +800,7 @@ def personal_account_mobile_create_for_address(request, address_id):
 
 # licen/views.py
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def internet_provider_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -766,7 +823,7 @@ def internet_provider_create_for_address(request, address_id):
 
 # licen/views.py
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_internet_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -787,7 +844,7 @@ def personal_account_internet_create_for_address(request, address_id):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def wifi_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -808,7 +865,7 @@ def wifi_create_for_address(request, address_id):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def router_admin_panel_create_for_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -1724,17 +1781,19 @@ def ofd_delete(request, pk):
 
 
 # ====== Мобильные операторы ======
+@role_required(admin)
 @login_required
 def mobile_operator_list(request):
     operators = MobileOperator.objects.all().order_by('operator', 'phone_number')
     return render(request, 'licen/mobile_operator/mobile_operator_list.html', {'operators': operators})
 
+@role_required(admin)
 @login_required
 def mobile_operator_detail(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
     return render(request, 'licen/mobile_operator/mobile_operator_detail.html', {'operator': operator})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def mobile_operator_create(request):
     if request.method == 'POST':
@@ -1750,7 +1809,7 @@ def mobile_operator_create(request):
         'title': 'Добавить мобильного оператора'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def mobile_operator_update(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
@@ -1769,7 +1828,7 @@ def mobile_operator_update(request, pk):
         'address': operator.address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def mobile_operator_delete(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
@@ -1784,17 +1843,19 @@ def mobile_operator_delete(request, pk):
 
 
 # ====== Интернет провайдер ======
+@role_required(admin)
 @login_required
 def internet_provider_list(request):
     providers = InternetProvider.objects.all().order_by('provider', 'address')
     return render(request, 'licen/internet_provider/internet_provider_list.html', {'providers': providers})
 
+@role_required(admin)
 @login_required
 def internet_provider_detail(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
     return render(request, 'licen/internet_provider/internet_provider_detail.html', {'provider': provider})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def internet_provider_create(request):
     if request.method == 'POST':
@@ -1810,7 +1871,7 @@ def internet_provider_create(request):
         'title': 'Добавить интернет-провайдера'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def internet_provider_update(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
@@ -1830,7 +1891,7 @@ def internet_provider_update(request, pk):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def internet_provider_delete(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
@@ -1845,17 +1906,19 @@ def internet_provider_delete(request, pk):
 
 
 # ====== WiFi ======
+@role_required(admin)
 @login_required
 def wifi_list(request):
     wifis = WiFi.objects.all().order_by('name')
     return render(request, 'licen/wifi/wifi_list.html', {'wifis': wifis})
 
+@role_required(admin)
 @login_required
 def wifi_detail(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
     return render(request, 'licen/wifi/wifi_detail.html', {'wifi': wifi})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def wifi_create(request):
     if request.method == 'POST':
@@ -1871,7 +1934,7 @@ def wifi_create(request):
         'title': 'Добавить WiFi'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def wifi_update(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
@@ -1891,7 +1954,7 @@ def wifi_update(request, pk):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def wifi_delete(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
@@ -1906,17 +1969,19 @@ def wifi_delete(request, pk):
 
 
 # ====== Роутер админ панель ======
+@role_required(admin)
 @login_required
 def router_admin_panel_list(request):
     panels = RouterAdminPanel.objects.all().order_by('address', 'name')
     return render(request, 'licen/router_admin_panel/router_admin_panel_list.html', {'panels': panels})
 
+@role_required(admin)
 @login_required
 def router_admin_panel_detail(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
     return render(request, 'licen/router_admin_panel/router_admin_panel_detail.html', {'panel': panel})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def router_admin_panel_create(request):
     if request.method == 'POST':
@@ -1932,7 +1997,7 @@ def router_admin_panel_create(request):
         'title': 'Добавить панель роутера'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def router_admin_panel_update(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
@@ -1952,7 +2017,7 @@ def router_admin_panel_update(request, pk):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def router_admin_panel_delete(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
@@ -1967,18 +2032,19 @@ def router_admin_panel_delete(request, pk):
 
 
 # ====== Аккаунт интернет пров ======
-
+@role_required(admin)
 @login_required
 def personal_account_internet_provider_list(request):
     accounts = PersonalAccountInternetProvider.objects.all().order_by('internet_provider', 'login')
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_list.html', {'accounts': accounts})
 
+@role_required(admin)
 @login_required
 def personal_account_internet_provider_detail(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_detail.html', {'account': account})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_internet_provider_create(request):
     if request.method == 'POST':
@@ -1994,7 +2060,7 @@ def personal_account_internet_provider_create(request):
         'title': 'Добавить личный кабинет интернет-провайдера'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_internet_provider_update(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
@@ -2014,7 +2080,7 @@ def personal_account_internet_provider_update(request, pk):
         'address': address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_internet_provider_delete(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
@@ -2029,17 +2095,19 @@ def personal_account_internet_provider_delete(request, pk):
 
 
 # ====== Аккаунт мобильных операторов ======
+@role_required(admin)
 @login_required
 def personal_account_mobile_operator_list(request):
     accounts = PersonalAccountMobileOperator.objects.all().order_by('mobile_operator', 'login')
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_list.html', {'accounts': accounts})
 
+@role_required(admin)
 @login_required
 def personal_account_mobile_operator_detail(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_detail.html', {'account': account})
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_mobile_operator_create(request):
     if request.method == 'POST':
@@ -2055,7 +2123,7 @@ def personal_account_mobile_operator_create(request):
         'title': 'Добавить личный кабинет мобильного оператора'
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_mobile_operator_update(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, id=pk)
@@ -2075,7 +2143,7 @@ def personal_account_mobile_operator_update(request, pk):
         'address': address  # ← Важно: передаём address
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def personal_account_mobile_operator_delete(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
@@ -2116,6 +2184,7 @@ def license_list(request, license_type=None):
 @login_required
 def license_detail(request, license_type, license_id):
     from licen.models import LicenseBaseModel
+
     model_class = None
     for model in LicenseBaseModel.__subclasses__():
         if model.__name__ == license_type:
@@ -2126,11 +2195,48 @@ def license_detail(request, license_type, license_id):
         raise Http404("Лицензия не найдена")
 
     obj = get_object_or_404(model_class, id=license_id)
+
+    # Получаем связанные объекты
+    computer = getattr(obj, 'computer', None)
+    address = getattr(obj, 'address', None)
+    legal_entity = getattr(obj, 'legal_entity', None)
+    network = getattr(obj, 'network', None)
+    city = getattr(obj, 'city', None)
+
     context = {
         'object': obj,
+        'computer': computer,  # ← теперь это объект, а не строка
+        'address': address,
+        'legal_entity': legal_entity,
+        'network': network,
+        'city': city,
         'title': f"{obj._meta.verbose_name} #{obj.id}"
     }
     return render(request, 'licen/license_detail.html', context)
+
+@login_required
+@role_required(admin, bookkeeper)
+def license_delete(request, license_type, license_id):
+    from licen.models import LicenseBaseModel
+    model_class = None
+    for model in LicenseBaseModel.__subclasses__():
+        if model.__name__ == license_type:
+            model_class = model
+            break
+    
+    if not model_class:
+        raise Http404("Лицензия не найдена")
+
+    obj = get_object_or_404(model_class, id=license_id)
+
+    if request.method == 'POST':
+        obj.delete()
+        return HttpResponseRedirect(reverse('license-list'))
+
+    return render(request, 'licen/license_confirm_delete.html', {
+        'object': obj,
+        'title': f'Удалить уведомление #{obj.id}'
+    })
 
 @role_required(admin, bookkeeper)
 @login_required

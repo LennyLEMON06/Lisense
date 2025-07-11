@@ -2,28 +2,117 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h2>Детали лицензии: {{ object.get_verbose_name }}</h2>
-    <dl class="row mt-4">
-        <dt class="col-sm-3">ID:</dt>
-        <dd class="col-sm-9">#{{ object.id }}</dd>
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Детали уведомления: {{ object.get_verbose_name }}</h2>
+                <span class="badge bg-light text-dark">#{{ object.id }}</span>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="text-muted border-bottom pb-2 mb-3">Основная информация</h5>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 fw-normal text-muted">Дата окончания:</dt>
+                            <dd class="col-sm-7">{{ object.end_date|date:"d.m.Y" }}</dd>
 
-        <dt class="col-sm-3">Дата начала:</dt>
-        <dd class="col-sm-9">{{ object.start_date|date:"d.m.Y" }}</dd>
+                            <dt class="col-sm-5 fw-normal text-muted">Компьютер:</dt>
+                            <dd class="col-sm-7">
+                                {% if computer %}
+                                    <a href="{% url 'computer-detail' computer.id %}">{{ computer.name }}</a>
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </dd>
 
-        <dt class="col-sm-3">Дата окончания:</dt>
-        <dd class="col-sm-9">{{ object.end_date|date:"d.m.Y" }}</dd>
+                            <dt class="col-sm-5 fw-normal text-muted">Адрес:</dt>
+                            <dd class="col-sm-7">
+                                {% if address %}
+                                    <a href="{% url 'address-detail' address.id %}">{{ address.address }}</a>
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="text-muted border-bottom pb-2 mb-3">Дополнительная информация</h5>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 fw-normal text-muted">Сеть:</dt>
+                            <dd class="col-sm-7">
+                                {% if network %}
+                                    <a href="{% url 'network-detail' network.id %}">{{ network.name }}</a>
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </dd>
 
-        <dt class="col-sm-3">Осталось дней:</dt>
-        <dd class="col-sm-9">
-            {% with days_left=object.days_left %}
-                {% if days_left <= 0 %}
-                    Лицензия истекла
-                {% else %}
-                    {{ days_left }} дн.
-                {% endif %}
-            {% endwith %}
-        </dd>
-    </dl>
+                            <dt class="col-sm-5 fw-normal text-muted">Юридическое лицо:</dt>
+                            <dd class="col-sm-7">
+                                {% if legal_entity %}
+                                        <a href="{% url 'legal-entity-detail' legal_entity.id %}">{{ legal_entity.name }}</a>
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-5 fw-normal text-muted">Город:</dt>
+                            <dd class="col-sm-7">
+                                {% if city %}
+                                    <a href="{% url 'city-detail' city.id %}">{{ city.name }}</a>
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer bg-light">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Назад
+            </a>
+        </div>
+    </div>
 </div>
+
+<style>
+    @media (max-width: 768px) {
+        .card-body .col-md-6 {
+            margin-bottom: 1rem;
+        }
+        dt.col-sm-5 {
+            width: 40%;
+        }
+        dd.col-sm-7 {
+            width: 60%;
+        }
+    }
+    
+    .card {
+        border-radius: 0.5rem;
+    }
+    
+    dl.row {
+        margin-bottom: 0;
+    }
+    
+    dt, dd {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    dt:last-of-type, dd:last-of-type {
+        border-bottom: none;
+    }
+</style>
 {% endblock %}

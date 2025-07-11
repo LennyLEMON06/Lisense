@@ -72,9 +72,6 @@
                 <div class="mb-2">
                     <strong>Название:</strong> <a href="{% url 'legal-entity-detail' entity.id %}">{{ entity.name }}</a>
                 </div>
-                <div class="mb-2">
-                    <strong>ИНН:</strong> {{ entity.inn }}
-                </div>
                 <div class="mb-3">
                     <strong>Комментарии:</strong> {{ entity.comments|truncatechars:50 }}
                 </div>

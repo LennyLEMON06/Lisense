@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Подтверждение удаления{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-danger text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <h5 class="mb-0">Подтверждение удаления уведомления</h5>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-octagon-fill me-3 fs-4"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">Внимание! Это действие необратимо</h6>
+                            <p class="mb-0">Вы собираетесь удалить уведомление. Пожалуйста, подтвердите ваше действие.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h6 class="text-danger mb-3 pb-2 border-bottom">Информация о уведомлении</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex mb-2">
+                                <span class="text-muted flex-shrink-0" style="width: 120px;">Тип:</span>
+                                <strong>{{ object.get_verbose_name }}</strong>
+                            </li>
+                            <li class="d-flex mb-2">
+                                <span class="text-muted flex-shrink-0" style="width: 120px;">ID:</span>
+                                <strong>#{{ object.id }}</strong>
+                            </li>
+                            <li class="d-flex">
+                                <span class="text-muted flex-shrink-0" style="width: 120px;">Дата окончания:</span>
+                                <strong>{{ object.end_date|date:"d.m.Y" }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <form method="post" class="pt-2">
+                        {% csrf_token %}
+                        <div class="d-flex flex-wrap gap-3">
+                            <button type="submit" class="btn btn-danger px-4 py-2">
+                                Да, удалить
+                            </button>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+        .alert {
+            flex-direction: column;
+            text-align: center;
+        }
+        .alert i {
+            margin-bottom: 0.5rem;
+            margin-right: 0 !important;
+        }
+        .btn {
+            flex: 1 0 100%;
+        }
+        .btn + .btn {
+            margin-top: 0.5rem;
+            margin-left: 0 !important;
+        }
+    }
+    
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-radius: 0 !important;
+    }
+    
+    .list-unstyled li {
+        padding: 0.35rem 0;
+    }
+</style>
+{% endblock %}

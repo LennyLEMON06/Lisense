@@ -16,7 +16,6 @@
         <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
                     <th>Название</th>
                     <th>Действия</th>
                 </tr>
@@ -24,7 +23,6 @@
             <tbody>
                 {% for city in cities %}
                 <tr>
-                    <td>{{ city.id }}</td>
                     <td><a href="{% url 'city-detail' city.id %}">{{ city.name }}</a></td>
                     <td class="text-nowrap">
                         <a href="{% url 'city-detail' city.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
@@ -43,7 +41,6 @@
         <div class="col">
             <div class="card shadow-sm border h-100">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">#{{ city.id }}</h5>
                     <p class="card-text mb-2">
                         <strong>Город:</strong> {{ city.name|truncatechars:30 }}
                     </p>

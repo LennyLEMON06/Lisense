@@ -15,6 +15,20 @@
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
+  <!-- Open Graph метатеги -->
+  <meta property="og:title" content="LICENSE">
+  <meta property="og:description" content="LICENSE - Отслеживание сроков и ведение учётов">
+  <meta property="og:url" content="http://38.180.146.160/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LICENSE">
+
+  <!-- Twitter Card метатеги -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LICENSE">
+  <meta name="twitter:description" content="LICENSE - Отслеживание сроков и ведение учётов">
+
+  <link rel="icon" type="image/x-icon" href="{% static 'icon/favicon.ico' %}">
+
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'licen/css/style.css' %}">
 
@@ -109,7 +123,7 @@
                 <input class="form-check-input" type="checkbox" id="remember">
                 <label class="form-check-label" for="remember">Запомнить меня</label>
               </div>
-              <a href="#" class="text-primary">Забыли пароль?</a>
+              <a href="{% url 'password_reset' %}" class="text-primary">Забыли пароль?</a>
             </div>
             <button type="submit" class="btn btn-primary w-100">Войти</button>
             <p class="text-center mt-4 text-secondary-light">Нет аккаунта? <a href="{% url 'register' %}" class="text-primary fw-semibold">Зарегистрироваться</a></p>

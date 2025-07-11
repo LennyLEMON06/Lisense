@@ -4,126 +4,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-transparent border-0 pb-0 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                    <div class="d-flex align-items-center mb-3 mb-md-0">
-                        <div class="icon-shape icon-shape-primary rounded-3 me-3">
-                            <i class="bi bi-bell-fill"></i>
-                        </div>
-                        <div>
-                            {% if profile.role == 'admin' %}
-                                <h2 class="mb-0 fw-bold">Управление уведомлениями</h2>
-                            {% else %}
-                                <h2 class="mb-0 fw-bold">Уведомления</h2>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'license-select-type' %}" class="btn btn-primary">
-                            <i class="ri-add-line me-2"></i>Добавить лицензию
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 overflow-hidden">
-                <div class="card-body p-0">
-                    {% if licenses %}
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Тип лицензии</th>
-                                    <th>ID</th>
-                                    <th>Статус</th>
-                                    <th>Дата окончания</th>
-                                    <th>Осталось</th>
-                                    <th class="pe-4">Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in licenses %}
-                                {% with item.object.end_date|timesince_days as days_left %}
-                                {% if days_left <= 30 %}
-                                <tr class="license-row {% if days_left <= 0 %}license-expired{% elif days_left <= 7 %}license-warning{% else %}license-info{% endif %}">
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="icon-shape icon-shape-{{ item.color|default:'primary' }} rounded-2">
-                                                <i class="ri-{{ item.icon|default:'key-2-line' }}"></i>
-                                                <i class="bi bi-key-fill"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-semibold">{{ item.verbose_name }}</h6>
-                                                <small class="text-muted">{{ item.object.software.name|default:"Не указано" }}</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'license-detail' item.type item.id %}" class="text-decoration-none fw-semibold">
-                                            #{{ item.object.id }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {% if days_left <= 0 %}
-                                            <span class="badge bg-danger-light text-danger">Истёк срок</span>
-                                        {% elif days_left <= 7 %}
-                                            <span class="badge bg-warning-light text-warning">Срочно</span>
-                                        {% else %}
-                                            <span class="badge bg-info-light text-info">Истекает</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="fw-medium">{{ item.object.end_date|date:"d.m.Y" }}</td>
-                                    <td>
-                                        {% if days_left <= 0 %}
-                                            <span class="text-danger">Истек</span>
-                                        {% else %}
-                                            <span class="fw-semibold">{{ days_left }} дн.</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="pe-4">
-                                        <div class="btn-group">
-                                            <a href="{% url 'license-detail' item.type item.id %}" class="btn btn-sm btn-outline-info me-1" title="Просмотр">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="#" class="btn btn-sm btn-outline-danger" title="Удалить">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endwith %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <div class="mb-4">
-                            <img src="{% static 'images/no-notifications.svg' %}" alt="No notifications" style="max-height: 180px;">
-                        </div>
-                        <h4 class="fw-semibold mb-3">Нет активных уведомлений</h4>
-                        <p class="text-muted mb-4">Все лицензии действительны более 30 дней</p>
-                        <a href="{% url 'license-select-type' %}" class="btn btn-primary px-4">
-                            <i class="ri-add-line me-2"></i>Добавить лицензию
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block css %}
 <style>
     .icon-shape {
         width: 42px;
@@ -202,26 +83,131 @@
         background-color: rgba(13, 202, 240, 0.1);
     }
     
-    .bg-success-light {
-        background-color: rgba(25, 135, 84, 0.1);
-    }
-    
     .table-borderless td, .table-borderless th {
         border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .btn-outline-dark {
-        color: #212529;
-        border-color: #dee2e6;
-    }
-    
-    .btn-outline-dark:hover {
-        background-color: #212529;
-        border-color: #212529;
     }
     
     .btn-outline-danger {
         border-color: #dee2e6;
     }
 </style>
+
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pb-2 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <div class="icon-shape icon-shape-primary rounded-3 me-3">
+                            <i class="bi bi-bell-fill"></i>
+                        </div>
+                        <div>
+                            {% if profile.role == 'admin' %}
+                                <h2 class="mb-0 fw-bold">Управление уведомлениями</h2>
+                            {% else %}
+                                <h2 class="mb-0 fw-bold">Уведомления</h2>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'license-select-type' %}" class="btn btn-primary">
+                            <i class="ri-add-line me-2"></i>Добавить лицензию
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-body p-0">
+                    {% if licenses %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Тип лицензии</th>
+                                    <th>ID</th>
+                                    <th>Статус</th>
+                                    <th>Дата окончания</th>
+                                    <th>Осталось</th>
+                                    <th class="pe-4">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in licenses %}
+                                {% with item.object.end_date|timesince_days as days_left %}
+                                {% if days_left <= 30 %}
+                                <tr class="license-row {% if days_left <= 0 %}license-expired{% elif days_left <= 7 %}license-warning{% else %}license-info{% endif %}">
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="icon-shape icon-shape-{{ item.color|default:'primary' }} rounded-2">
+                                                <i class="ri-{{ item.icon|default:'key-2-line' }}"></i>
+                                                <i class="bi bi-key-fill"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-semibold">{{ item.verbose_name }}</h6>
+                                                <!-- <small class="text-muted">{{ item.object.software.name|default:"Не указано" }}</small> -->
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'license-detail' item.type item.id %}" class="text-decoration-none fw-semibold">
+                                            #{{ item.object.id }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if days_left <= 0 %}
+                                            <span class="badge bg-danger-light text-danger">Истёк срок</span>
+                                        {% elif days_left <= 7 %}
+                                            <span class="badge bg-warning-light text-warning">Срочно</span>
+                                        {% else %}
+                                            <span class="badge bg-info-light text-info">Истекает</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-medium">{{ item.object.end_date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if days_left <= 0 %}
+                                            <span class="text-danger">Истек</span>
+                                        {% else %}
+                                            <span class="fw-semibold">{{ days_left }} дн.</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4">
+                                        <div class="btn-group">
+                                            <a href="{% url 'license-detail' item.type item.id %}" class="btn btn-sm btn-outline-info me-1" title="Просмотр">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'license-delete' item.type item.id %}" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endwith %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <img src="{% static 'images/no-notifications.svg' %}" alt="No notifications" style="max-height: 180px;">
+                        </div>
+                        <h4 class="fw-semibold mb-3">Нет активных уведомлений</h4>
+                        <p class="text-muted mb-4">Все лицензии действительны более 30 дней</p>
+                        <a href="{% url 'license-select-type' %}" class="btn btn-primary px-4">
+                            <i class="ri-add-line me-2"></i>Добавить лицензию
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

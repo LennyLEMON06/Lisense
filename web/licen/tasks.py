@@ -117,7 +117,7 @@ def send_daily_notifications():
     print(f"📧 Отправлено {sent_count} уведомлений админам")
 
 @shared_task(name="licen.tasks.clear_old_notifications")
-def clear_old_notifications(days=30):
+def clear_old_notifications(days=1):
     from licen.models import LicenseNotification
     from datetime import timedelta
     from django.utils import timezone
