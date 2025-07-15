@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали почты</h2>
     <dl class="row g-3">
         <dt class="col-sm-3">Город:</dt>
@@ -27,8 +27,10 @@
     </dl>
 
     <div class="mt-4">
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'contact-person-update' person.id %}" class="btn btn-warning me-2">Редактировать</a>
         <a href="{% url 'contact-person-delete' person.id %}" class="btn btn-danger me-2">Удалить</a>
+        {% endif %}
         <a href="{% url 'contact-person-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 </div>

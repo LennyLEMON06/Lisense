@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали интернет-провайдера</h2>
     <dl class="row">
         <dt class="col-sm-3">ID:</dt>
@@ -27,8 +27,10 @@
         <dd class="col-sm-9">{{ provider.comments }}</dd>
     </dl>
 
+    {% if profile.role == 'admin' or profile.role == 'journalist'%}
     <a href="{% url 'internet-provider-update' provider.id %}" class="btn btn-warning">Редактировать</a>
     <a href="{% url 'internet-provider-delete' provider.id %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="{% url 'internet-provider-list' %}" class="btn btn-secondary">Назад к списку</a>
 </div>
 {% endblock %}

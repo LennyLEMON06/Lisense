@@ -2,12 +2,14 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Список адресов</h2>
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'address-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
             <i class="bi bi-plus-lg"></i> Добавить
         </a>
+        {% endif %}
     </div>
 
     {% if addresses %}
@@ -32,8 +34,10 @@
                     <td>{{ address.network.name }}</td>
                     <td class="text-nowrap">
                         <a href="{% url 'address-detail' address.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        {% if profile.role == 'admin' or profile.role == 'journalist'%}
                         <a href="{% url 'address-update' address.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'address-delete' address.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -59,8 +63,10 @@
                     </p>
                     <div class="d-flex justify-content-start gap-2 mt-3">
                         <a href="{% url 'address-detail' address.id %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        {% if profile.role == 'admin' or profile.role == 'journalist'%}
                         <a href="{% url 'address-update' address.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'address-delete' address.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

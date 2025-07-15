@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали лицензии Честный Знак</h2>
     <dl class="row">
         <dt class="col-sm-3">ID:</dt>
@@ -24,8 +24,10 @@
         <dd class="col-sm-9">{{ sign.comments }}</dd>
     </dl>
 
+    {% if profile.role == 'admin' or profile.role == 'journalist'%}
     <a href="{% url 'honest-sign-update' sign.id %}" class="btn btn-warning">Редактировать</a>
     <a href="{% url 'honest-sign-delete' sign.id %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="{% url 'honest-sign-list' %}" class="btn btn-secondary">Назад к списку</a>
 </div>
 {% endblock %}

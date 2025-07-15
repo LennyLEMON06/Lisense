@@ -1,7 +1,7 @@
 <!-- licen/templates/licen/legal_entity_detail.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <h2 class="mb-4">Детали сети</h2>
     
     <div class="card mb-4">
@@ -30,15 +30,19 @@
 
     <!-- Кнопки управления -->
     <div class="d-flex flex-wrap gap-3 mb-4">
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'legal-entity-update' legal_entity.id %}" class="btn btn-warning">Редактировать</a>
         <a href="{% url 'legal-entity-delete' legal_entity.id %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
         <a href="{% url 'legal-entity-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 
     <!-- Кнопка добавления юридического лица -->
+     {% if profile.role == 'admin' or profile.role == 'journalist'%}
     <div class="mb-4">
         <a href="{% url 'network-create-for-legal-entity' legal_entity.id %}" class="btn btn-success">+ Добавить юридическое лицо</a>
     </div>
+    {% endif %}
 
     <!-- Таблица сетей -->
     {% if networks %}
@@ -67,8 +71,10 @@
                     <td class="text-nowrap">
                         <div class="d-flex gap-2">
                             <a href="{% url 'network-detail' network.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'network-update' network.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'network-delete' network.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
@@ -96,8 +102,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{% url 'network-detail' network.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                     <a href="{% url 'network-update' network.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                     <a href="{% url 'network-delete' network.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                    {% endif %}
                 </div>
             </div>
         </div>

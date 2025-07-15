@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали личного кабинета мобильного оператора</h2>
     <dl class="row">
         <dt class="col-sm-3">ID:</dt>
@@ -24,8 +24,10 @@
         <dd class="col-sm-9">{{ account.comments }}</dd>
     </dl>
 
+    {% if profile.role == 'admin'%}
     <a href="{% url 'personal-account-mobile-operator-update' account.id %}" class="btn btn-warning">Редактировать</a>
     <a href="{% url 'personal-account-mobile-operator-delete' account.id %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="{% url 'personal-account-mobile-operator-list' %}" class="btn btn-secondary">Назад к списку</a>
 </div>
 {% endblock %}

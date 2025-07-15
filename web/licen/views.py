@@ -9,7 +9,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.forms import ModelForm
 from django.utils import timezone
 from django.db.models import Q
@@ -387,16 +387,30 @@ def search_results(request):
 @login_required
 def city_list(request):
     cities = City.objects.all().order_by('name')
-    return render(request, 'licen/city/city_list.html', {'cities': cities})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/city/city_list.html', {
+        'cities': cities,
+        'profile': profile})
 
 @login_required
 def city_detail(request, pk):
     city = get_object_or_404(City, pk=pk)
     legal_entities = LegalEntity.objects.filter(city=city)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/city/city_detail.html', {
         'city': city,
-        'legal_entities': legal_entities
+        'legal_entities': legal_entities,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -414,10 +428,16 @@ def legal_entity_create_for_city(request, city_id):
     else:
         form = LegalEntityForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/legal_entity/legal_entity_form.html', {
         'form': form,
         'city': city,  
-        'title': f"Добавить юридическое лицо для города «{city.name}»"
+        'title': f"Добавить юридическое лицо для города «{city.name}»",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -431,9 +451,15 @@ def city_create(request):
     else:
         form = CityForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/city/city_form.html', {
         'form': form,
-        'title': 'Добавить город'
+        'title': 'Добавить город',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -449,9 +475,15 @@ def city_update(request, pk):
     else:
         form = CityForm(instance=city)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/city/city_form.html', {
         'form': form,
-        'title': f"Редактировать {city.name}"
+        'title': f"Редактировать {city.name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -462,26 +494,46 @@ def city_delete(request, pk):
     if request.method == 'POST':
         city.delete()
         return redirect(reverse('city-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/city/city_confirm_delete.html', {
-        'object': city
+        'object': city,
+        'profile': profile
     })
 
 # ====== Почты ======
 @login_required
 def contact_person_list(request):
     persons = ContactPerson.objects.all().select_related('city')
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/contact_person/contact_person_list.html', {
         'persons': persons,
-        'title': 'Контактные лица'
+        'title': 'Контактные лица',
+        'profile': profile
     })
 
 @login_required
 def contact_person_detail(request, pk):
     person = get_object_or_404(ContactPerson, id=pk)
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/contact_person/contact_person_detail.html', {
         'person': person,
-        'title': f"Контактное лицо: {person.full_name}"
+        'title': f"Контактное лицо: {person.full_name}",
+        'profile': profile,
     })
 
 @role_required(admin, bookkeeper)
@@ -495,9 +547,15 @@ def contact_person_create(request):
     else:
         form = ContactPersonForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/contact_person/contact_person_form.html', {
         'form': form,
-        'title': 'Добавить контактное лицо'
+        'title': 'Добавить контактное лицо',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -513,9 +571,15 @@ def contact_person_update(request, pk):
     else:
         form = ContactPersonForm(instance=person)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/contact_person/contact_person_form.html', {
         'form': form,
-        'title': f"Редактировать: {person.full_name}"
+        'title': f"Редактировать: {person.full_name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -526,27 +590,47 @@ def contact_person_delete(request, pk):
     if request.method == 'POST':
         person.delete()
         return redirect('contact-person-list')
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/contact_person/contact_person_confirm_delete.html', {
-        'object': person
+        'object': person,
+        'profile': profile
     })
 
 # ====== Юр. лица ======
 @login_required
 def legal_entity_list(request):
     legal_entities = LegalEntity.objects.all().order_by('name')
-    return render(request, 'licen/legal_entity/legal_entity_list.html', {'legal_entities': legal_entities})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/legal_entity/legal_entity_list.html', {
+        'legal_entities': legal_entities,
+        'profile': profile})
 
 @login_required
 def legal_entity_detail(request, pk):
     legal_entity = get_object_or_404(LegalEntity, id=pk)
     networks = legal_entity.networks.all().order_by('name')  # ← загружаем все сети этого юрлица
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/legal_entity/legal_entity_detail.html', {
         'legal_entity': legal_entity,
         'city': legal_entity.city,
         'networks': networks,
-        'title': f"Сеть: {legal_entity.name}"
+        'title': f"Сеть: {legal_entity.name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -564,19 +648,32 @@ def network_create_for_legal_entity(request, legal_entity_id):
     else:
         form = NetworkForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/network/network_form.html', {
         'form': form,
         'title': f"Добавить юридическое лицо для «{legal_entity.name}»",
-        'legal_entity': legal_entity  # ← чтобы использовать в шаблоне
+        'legal_entity': legal_entity,  # ← чтобы использовать в шаблоне
+        'profile': profile
     })
 
 @login_required
 def legal_entity_list_for_network(request, network_id):
     network = get_object_or_404(Network, id=network_id)
     legal_entities = LegalEntity.objects.filter(networks=network)
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/legal_entity/legal_entity_list_for_network.html', {
         'legal_entities': legal_entities,
-        'network': network
+        'network': network,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -590,9 +687,15 @@ def legal_entity_create(request):
     else:
         form = LegalEntityForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/legal_entity/legal_entity_form.html', {
         'form': form,
-        'title': 'Добавить сеть'
+        'title': 'Добавить сеть',
+        'profile': profile,
     })
 
 @role_required(admin, bookkeeper)
@@ -609,10 +712,16 @@ def legal_entity_update(request, pk):
     else:
         form = LegalEntityForm(instance=legal_entity)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/legal_entity/legal_entity_form.html', {
         'form': form,
         'city': city,
-        'title': f"Редактировать {legal_entity.name}"
+        'title': f"Редактировать {legal_entity.name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -623,9 +732,15 @@ def legal_entity_delete(request, pk):
     if request.method == 'POST':
         legal_entity.delete()
         return redirect(reverse('legal-entity-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/legal_entity/legal_entity_confirm_delete.html', {
-        'object': legal_entity
+        'object': legal_entity,
+        'profile': profile,
     })
 
 
@@ -633,19 +748,34 @@ def legal_entity_delete(request, pk):
 @login_required
 def network_list(request):
     networks = Network.objects.all().order_by('name')
-    return render(request, 'licen/network/network_list.html', {'networks': networks})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/network/network_list.html', {
+        'networks': networks,
+        'profile': profile
+        })
 
 @login_required
 def network_detail(request, pk):
     network = get_object_or_404(Network, id=pk)
     addresses = network.addresses.all().order_by('address')  # ← загружаем адреса для этой сети
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
     
     return render(request, 'licen/network/network_detail.html', {
         'network': network,
         'addresses': addresses,
         'city': network.legal_entity.city,
         'legal_entity': network.legal_entity,
-        'title': f"Юридическое лицо: {network.name}"
+        'title': f"Юридическое лицо: {network.name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -666,17 +796,33 @@ def address_create_for_network(request, network_id):
     else:
         form = AddressForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/address/address_form.html', {
         'form': form,
         'title': f"Добавить адрес для сети «{network.name}»",
-        'network': network
+        'network': network,
+        'profile': profile
     })
 
 @login_required
 def network_list_for_city(request, city_id):
     city = get_object_or_404(City, id=city_id)
     networks = Network.objects.filter(legal_entity__city=city)
-    return render(request, 'licen/network/network_list_for_city.html', {'networks': networks, 'city': city})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/network/network_list_for_city.html', {
+        'networks': networks, 
+        'city': city,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -689,9 +835,15 @@ def network_create(request):
     else:
         form = NetworkForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/network/network_form.html', {
         'form': form,
-        'title': 'Добавить юридическое лицо'
+        'title': 'Добавить юридическое лицо',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -708,10 +860,16 @@ def network_update(request, pk):
     else:
         form = NetworkForm(instance=network)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/network/network_form.html', {
         'form': form,
         'legal_entity': legal_entity,
-        'title': f"Редактировать {network.name}"
+        'title': f"Редактировать {network.name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -722,9 +880,15 @@ def network_delete(request, pk):
     if request.method == 'POST':
         network.delete()
         return redirect(reverse('network-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/network/network_confirm_delete.html', {
-        'object': network
+        'object': network,
+        'profile': profile
     })
 
 
@@ -732,11 +896,25 @@ def network_delete(request, pk):
 @login_required
 def address_list(request):
     addresses = Address.objects.all().order_by('network', 'address')
-    return render(request, 'licen/address/address_list.html', {'addresses': addresses})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/address/address_list.html', {
+        'addresses': addresses,
+        'profile': profile
+        })
 
 @login_required
 def address_detail(request, pk):
     address = get_object_or_404(Address, id=pk)
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
     
     return render(request, 'licen/address/address_detail.html', {
         'address': address,
@@ -750,7 +928,8 @@ def address_detail(request, pk):
         'computers': Computer.objects.filter(address=address),
         'personal_accounts_mobile': PersonalAccountMobileOperator.objects.filter(address=address),
         'personal_accounts_internet': PersonalAccountInternetProvider.objects.filter(address=address),
-        'title': f"Адрес: {address.address}"
+        'title': f"Адрес: {address.address}",
+        'profile': profile
     })
 
 @role_required(admin)
@@ -768,10 +947,16 @@ def mobile_operator_create_for_address(request, address_id):
     else:
         form = MobileOperatorForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mobile_operator/mobile_operator_form.html', {
         'form': form,
         'title': f"Добавить мобильного оператора для адреса {address.address}",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 # licen/views.py
@@ -791,10 +976,16 @@ def personal_account_mobile_create_for_address(request, address_id):
     else:
         form = PersonalAccountMobileOperatorForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_form.html', {
         'form': form,
         'title': f"Добавить личный кабинет для адреса «{address.address}»",
-        'address': address  # ← эта строчка ОБЯЗАТЕЛЬНА
+        'address': address,  # ← эта строчка ОБЯЗАТЕЛЬНА
+        'profile': profile
     })
 
 
@@ -815,10 +1006,16 @@ def internet_provider_create_for_address(request, address_id):
     else:
         form = InternetProviderForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/internet_provider/internet_provider_form.html', {
         'form': form,
         'title': f"Добавить интернет-провайдера для адреса «{address.address}»",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 # licen/views.py
@@ -838,10 +1035,17 @@ def personal_account_internet_create_for_address(request, address_id):
     else:
         form = PersonalAccountInternetProviderForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_form.html', {
         'form': form,
         'title': f"Добавить кабинет интернет-провайдера для адреса «{address.address}»",
-        'address': address
+        'address': address,
+        'profile': profile,
+
     })
 
 @role_required(admin)
@@ -859,10 +1063,16 @@ def wifi_create_for_address(request, address_id):
     else:
         form = WiFiForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/wifi/wifi_form.html', {
         'form': form,
         'title': f"Добавить WiFi сеть для адреса «{address.address}»",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -880,10 +1090,16 @@ def router_admin_panel_create_for_address(request, address_id):
     else:
         form = RouterAdminPanelForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/router_admin_panel/router_admin_panel_form.html', {
         'form': form,
         'title': f"Добавить доступ в админ-панель роутера для адреса «{address.address}»",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -901,10 +1117,16 @@ def computer_create_for_address(request, address_id):
     else:
         form = ComputerForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/computer/computer_form.html', {
         'form': form,
         'title': f"Добавить компьютер для адреса «{address.address}»",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -918,9 +1140,15 @@ def address_create(request):
     else:
         form = AddressForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/address/address_form.html', {
         'form': form,
-        'title': 'Добавить адрес'
+        'title': 'Добавить адрес',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -937,10 +1165,16 @@ def address_update(request, pk):
     else:
         form = AddressForm(instance=address)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/address/address_form.html', {
         'form': form,
         'network': network,
-        'title': f"Редактировать {address.network}"
+        'title': f"Редактировать {address.network}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -951,9 +1185,15 @@ def address_delete(request, pk):
     if request.method == 'POST':
         address.delete()
         return redirect(reverse('address-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/address/address_confirm_delete.html', {
-        'object': address
+        'object': address,
+        'profile': profile
     })
 
 
@@ -961,7 +1201,15 @@ def address_delete(request, pk):
 @login_required
 def computer_list(request):
     computers = Computer.objects.all().order_by('address', 'name')
-    return render(request, 'licen/computer/computer_list.html', {'computers': computers})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/computer/computer_list.html', {
+        'computers': computers,
+        'profile': profile})
 
 @login_required
 def computer_detail(request, pk):
@@ -980,6 +1228,11 @@ def computer_detail(request, pk):
     remote_accesses = RemoteAccess.objects.filter(computer=computer)
     usais_list = USAIS.objects.filter(computer=computer)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/computer/computer_detail.html', {
         'computer': computer,
         'fiscal_numbers': fiscal_numbers,
@@ -996,6 +1249,7 @@ def computer_detail(request, pk):
         'network': computer.address.network,
         'legal_entity': computer.address.network.legal_entity,
         'city': computer.address.network.legal_entity.city,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1012,10 +1266,16 @@ def fiscal_number_create_for_computer(request, computer_id):
         print("Переходим на компьютер", computer.id)
         return redirect('computer-detail', pk=computer.id)
     
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+    
     return render(request, 'licen/fiscal_number/fiscal_number_form.html', {
         'form': form,
         'title': f"Добавить фискальный номер для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1033,10 +1293,16 @@ def crypto_pro_create_for_computer(request, computer_id):
     else:
         form = CryptoProForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/crypto_pro/crypto_pro_form.html', {
         'form': form,
         'title': f"Добавить CryptoPro для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1054,10 +1320,16 @@ def ecp_create_for_computer(request, computer_id):
     else:
         form = ECPForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ecp/ecp_form.html', {
         'form': form,
         'title': f"Добавить ЭЦП для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1075,10 +1347,16 @@ def utm_rsa_keys_create_for_computer(request, computer_id):
     else:
         form = UTMRSAKeysForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_form.html', {
         'form': form,
         'title': f"Добавить УТМ RSA ключ для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1096,10 +1374,16 @@ def mcd_create_for_computer(request, computer_id):
     else:
         form = MCDForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mcd/mcd_form.html', {
         'form': form,
         'title': f"Добавить МЧД для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1117,10 +1401,16 @@ def honest_sign_create_for_computer(request, computer_id):
     else:
         form = HonestSignForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/honest_sign/honest_sign_form.html', {
         'form': form,
         'title': f"Добавить Честный Знак для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1138,10 +1428,16 @@ def ofd_create_for_computer(request, computer_id):
     else:
         form = OFDForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ofd/ofd_form.html', {
         'form': form,
         'title': f"Добавить ОФД для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1159,10 +1455,16 @@ def remote_access_create_for_computer(request, computer_id):
     else:
         form = RemoteAccessForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/remote_access/remote_access_form.html', {
         'form': form,
         'title': f"Добавить удалённый доступ для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1176,9 +1478,15 @@ def computer_create(request):
     else:
         form = ComputerForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/computer/computer_form.html', {
         'form': form,
-        'title': 'Добавить компьютер'
+        'title': 'Добавить компьютер',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1195,10 +1503,16 @@ def computer_update(request, pk):
     else:
         form = ComputerForm(instance=computer)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/computer/computer_form.html', {
         'form': form,
         'title': f"Редактировать {computer.name}",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1209,21 +1523,45 @@ def computer_delete(request, pk):
     if request.method == 'POST':
         computer.delete()
         return redirect(reverse('computer-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/computer/computer_confirm_delete.html', {
-        'object': computer
+        'object': computer,
+        'profile': profile
     })
 
 # ====== Удаленный доступ ======
 @login_required
 def remote_access_list(request):
     accesses = RemoteAccess.objects.all().order_by('computer', 'name')
-    return render(request, 'licen/remote_access/remote_access_list.html', {'accesses': accesses})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/remote_access/remote_access_list.html', {
+        'accesses': accesses,
+        'profile': profile
+        })
 
 @login_required
 def remote_access_detail(request, pk):
     access = get_object_or_404(RemoteAccess, pk=pk)
-    return render(request, 'licen/remote_access/remote_access_detail.html', {'access': access})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/remote_access/remote_access_detail.html', {
+        'access': access,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1236,9 +1574,15 @@ def remote_access_create(request):
     else:
         form = RemoteAccessForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/remote_access/remote_access_form.html', {
         'form': form,
-        'title': 'Добавить удаленный доступ'
+        'title': 'Добавить удаленный доступ',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1255,10 +1599,16 @@ def remote_access_update(request, pk):
     else:
         form = RemoteAccessForm(instance=access)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/remote_access/remote_access_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {access.get_name_display()}"
+        'title': f"Редактировать {access.get_name_display()}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1269,21 +1619,43 @@ def remote_access_delete(request, pk):
     if request.method == 'POST':
         access.delete()
         return redirect(reverse('remote-access-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/remote_access/remote_access_confirm_delete.html', {
-        'object': access
+        'object': access,
+        'profile': profile
     })
 
 # ====== фиск накоп ======
 @login_required
 def fiscal_number_list_one(request):
     fiscal_numbers = FiscalNumber.objects.all().order_by('reg_number', 'model')
-    return render(request, 'licen/fiscal_number/fiscal_number_list.html', {'fiscal_numbers': fiscal_numbers})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/fiscal_number/fiscal_number_list.html', {
+        'fiscal_numbers': fiscal_numbers,
+        'profile': profile})
 
 @login_required
 def fiscal_number_detail_one(request, pk):
     fiscal_number = get_object_or_404(FiscalNumber, pk=pk)
-    return render(request, 'licen/fiscal_number/fiscal_number_detail.html', {'fiscal_number': fiscal_number})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/fiscal_number/fiscal_number_detail.html', {
+        'fiscal_number': fiscal_number,
+        'profile': profile})
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1296,9 +1668,15 @@ def fiscal_number_create_one(request):
     else:
         form = FiscalNumberForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/fiscal_number/fiscal_number_form.html', {
         'form': form,
-        'title': 'Добавить ФН'
+        'title': 'Добавить ФН',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1315,10 +1693,16 @@ def fiscal_number_update_one(request, pk):
     else:
         form = FiscalNumberForm(instance=fiscal_number)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/fiscal_number/fiscal_number_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {fiscal_number.model} ({fiscal_number.reg_number})"
+        'title': f"Редактировать {fiscal_number.model} ({fiscal_number.reg_number})",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1329,9 +1713,15 @@ def fiscal_number_delete_one(request, pk):
     if request.method == 'POST':
         fiscal_number.delete()
         return redirect(reverse('fiscal-number-list-one'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/fiscal_number/fiscal_number_confirm_delete.html', {
-        'object': fiscal_number
+        'object': fiscal_number,
+        'profile': profile
     })
 
 
@@ -1339,12 +1729,28 @@ def fiscal_number_delete_one(request, pk):
 @login_required
 def crypto_pro_list(request):
     crypto_pros = CryptoPro.objects.all().order_by('end_date')
-    return render(request, 'licen/crypto_pro/crypto_pro_list.html', {'crypto_pros': crypto_pros})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/crypto_pro/crypto_pro_list.html', {
+        'crypto_pros': crypto_pros,
+        'profile': profile})
 
 @login_required
 def crypto_pro_detail(request, pk):
     crypto_pro = get_object_or_404(CryptoPro, pk=pk)
-    return render(request, 'licen/crypto_pro/crypto_pro_detail.html', {'crypto_pro': crypto_pro})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/crypto_pro/crypto_pro_detail.html', {
+        'crypto_pro': crypto_pro,
+        'profile': profile})
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1357,9 +1763,15 @@ def crypto_pro_create(request):
     else:
         form = CryptoProForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/crypto_pro/crypto_pro_form.html', {
         'form': form,
-        'title': 'Добавить CryptoPro'
+        'title': 'Добавить CryptoPro',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1376,10 +1788,16 @@ def crypto_pro_update(request, pk):
     else:
         form = CryptoProForm(instance=crypto_pro)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/crypto_pro/crypto_pro_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {crypto_pro.key}"
+        'title': f"Редактировать {crypto_pro.key}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1390,9 +1808,15 @@ def crypto_pro_delete(request, pk):
     if request.method == 'POST':
         crypto_pro.delete()
         return redirect(reverse('crypto-pro-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/crypto_pro/crypto_pro_confirm_delete.html', {
-        'object': crypto_pro
+        'object': crypto_pro,
+        'profile': profile
     })
 
 
@@ -1400,12 +1824,30 @@ def crypto_pro_delete(request, pk):
 @login_required
 def ecp_list(request):
     ecps = ECP.objects.all().order_by('full_name')
-    return render(request, 'licen/ecp/ecp_list.html', {'ecps': ecps})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/ecp/ecp_list.html', {
+        'ecps': ecps,
+        'profile': profile
+        })
 
 @login_required
 def ecp_detail(request, pk):
     ecp = get_object_or_404(ECP, pk=pk)
-    return render(request, 'licen/ecp/ecp_detail.html', {'ecp': ecp})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/ecp/ecp_detail.html', {
+        'ecp': ecp,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1418,9 +1860,15 @@ def ecp_create(request):
     else:
         form = ECPForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ecp/ecp_form.html', {
         'form': form,
-        'title': 'Добавить ЭЦП'
+        'title': 'Добавить ЭЦП',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1437,10 +1885,16 @@ def ecp_update(request, pk):
     else:
         form = ECPForm(instance=ecp)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ecp/ecp_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {ecp.full_name}"
+        'title': f"Редактировать {ecp.full_name}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1451,21 +1905,44 @@ def ecp_delete(request, pk):
     if request.method == 'POST':
         ecp.delete()
         return redirect(reverse('ecp-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/ecp/ecp_confirm_delete.html', {
-        'object': ecp
+        'object': ecp,
+        'profile': profile
     })
 
 # ====== utmr_sakeys ======
 @login_required
 def utmr_sakeys_list(request):
     keys = UTMRSAKeys.objects.all().order_by('key')
-    return render(request, 'licen/utmr_sakeys/utmr_sakeys_list.html', {'keys': keys})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/utmr_sakeys/utmr_sakeys_list.html', {
+        'keys': keys,
+        'profile': profile})
 
 @login_required
 def utmr_sakeys_detail(request, pk):
     key = get_object_or_404(UTMRSAKeys, pk=pk)
-    return render(request, 'licen/utmr_sakeys/utmr_sakeys_detail.html', {'key': key})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/utmr_sakeys/utmr_sakeys_detail.html', {
+        'key': key,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1478,9 +1955,15 @@ def utmr_sakeys_create(request):
     else:
         form = UTMRSAKeysForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_form.html', {
         'form': form,
-        'title': 'Добавить УТМ RSA Ключ'
+        'title': 'Добавить УТМ RSA Ключ',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1497,10 +1980,16 @@ def utmr_sakeys_update(request, pk):
     else:
         form = UTMRSAKeysForm(instance=key)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {key.key}"
+        'title': f"Редактировать {key.key}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1511,21 +2000,45 @@ def utmr_sakeys_delete(request, pk):
     if request.method == 'POST':
         key.delete()
         return redirect(reverse('utmr-sakeys-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/utmr_sakeys/utmr_sakeys_confirm_delete.html', {
-        'object': key
+        'object': key,
+        'profile': profile
     })
 
 # ====== МЧД ======
 @login_required
 def mcd_list(request):
     mcds = MCD.objects.all().order_by('mcd_id')
-    return render(request, 'licen/mcd/mcd_list.html', {'mcds': mcds})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/mcd/mcd_list.html', {
+        'mcds': mcds,
+        'profile': profile
+        })
 
 @login_required
 def mcd_detail(request, pk):
     mcd = get_object_or_404(MCD, pk=pk)
-    return render(request, 'licen/mcd/mcd_detail.html', {'mcd': mcd})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/mcd/mcd_detail.html', {
+        'mcd': mcd,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1538,9 +2051,15 @@ def mcd_create(request):
     else:
         form = MCDForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mcd/mcd_form.html', {
         'form': form,
-        'title': 'Добавить МЧД'
+        'title': 'Добавить МЧД',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1557,10 +2076,16 @@ def mcd_update(request, pk):
     else:
         form = MCDForm(instance=mcd)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mcd/mcd_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {mcd.mcd_id}"
+        'title': f"Редактировать {mcd.mcd_id}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1571,21 +2096,44 @@ def mcd_delete(request, pk):
     if request.method == 'POST':
         mcd.delete()
         return redirect(reverse('mcd-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/mcd/mcd_confirm_delete.html', {
-        'object': mcd
+        'object': mcd,
+        'profile': profile
     })
 
 # ====== ЕГАИС ======
 @login_required
 def usa_is_list(request):
     licenses = USAIS.objects.all().order_by('end_date', 'key')
-    return render(request, 'licen/usais/usais_list.html', {'licenses': licenses})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/usais/usais_list.html', {
+        'licenses': licenses,
+        'profile': profile})
 
 @login_required
 def usa_is_detail(request, pk):
     license = get_object_or_404(USAIS, id=pk)
-    return render(request, 'licen/usais/usais_detail.html', {'license': license})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/usais/usais_detail.html', {
+        'license': license,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1598,9 +2146,15 @@ def usa_is_create(request):
     else:
         form = USAISForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/usais/usais_form.html', {
         'form': form,
-        'title': 'Добавить лицензию ЕГАИС'
+        'title': 'Добавить лицензию ЕГАИС',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1617,10 +2171,16 @@ def usa_is_update(request, pk):
     else:
         form = USAISForm(instance=license)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/usais/usais_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {license.key}"
+        'title': f"Редактировать {license.key}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1632,8 +2192,14 @@ def usa_is_delete(request, pk):
         license.delete()
         return redirect('usais-list')
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/usais/usais_confirm_delete.html', {
-        'object': license
+        'object': license,
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1651,10 +2217,16 @@ def usa_is_create_for_computer(request, computer_id):
     else:
         form = USAISForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/usais/usais_form.html', {
         'form': form,
         'title': f"Добавить ЕГАИС для {computer.name}",
-        'computer': computer
+        'computer': computer,
+        'profile': profile
     })
 
 
@@ -1662,12 +2234,28 @@ def usa_is_create_for_computer(request, computer_id):
 @login_required
 def honest_sign_list(request):
     signs = HonestSign.objects.all().order_by('key')
-    return render(request, 'licen/honest_sign/honest_sign_list.html', {'signs': signs})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/honest_sign/honest_sign_list.html', {
+        'signs': signs,
+        'profile': profile})
 
 @login_required
 def honest_sign_detail(request, pk):
     sign = get_object_or_404(HonestSign, pk=pk)
-    return render(request, 'licen/honest_sign/honest_sign_detail.html', {'sign': sign})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/honest_sign/honest_sign_detail.html', {
+        'sign': sign,
+        'profile': profile})
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1680,9 +2268,15 @@ def honest_sign_create(request):
     else:
         form = HonestSignForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/honest_sign/honest_sign_form.html', {
         'form': form,
-        'title': 'Добавить Честный знак'
+        'title': 'Добавить Честный знак',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1699,10 +2293,16 @@ def honest_sign_update(request, pk):
     else:
         form = HonestSignForm(instance=sign)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/honest_sign/honest_sign_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {sign.key}"
+        'title': f"Редактировать {sign.key}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1713,9 +2313,15 @@ def honest_sign_delete(request, pk):
     if request.method == 'POST':
         sign.delete()
         return redirect(reverse('honest-sign-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/honest_sign/honest_sign_confirm_delete.html', {
-        'object': sign
+        'object': sign,
+        'profile': profile
     })
 
 
@@ -1723,12 +2329,29 @@ def honest_sign_delete(request, pk):
 @login_required
 def ofd_list(request):
     ofds = OFD.objects.all().order_by('reg_number')
-    return render(request, 'licen/ofd/ofd_list.html', {'ofds': ofds})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/ofd/ofd_list.html', {
+        'ofds': ofds,
+        'profile': profile})
 
 @login_required
 def ofd_detail(request, pk):
     ofd = get_object_or_404(OFD, pk=pk)
-    return render(request, 'licen/ofd/ofd_detail.html', {'ofd': ofd})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/ofd/ofd_detail.html', {
+        'ofd': ofd,
+        'profile': profile
+        })
 
 @role_required(admin, bookkeeper)
 @login_required
@@ -1741,9 +2364,15 @@ def ofd_create(request):
     else:
         form = OFDForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ofd/ofd_form.html', {
         'form': form,
-        'title': 'Добавить ОФД'
+        'title': 'Добавить ОФД',
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1760,10 +2389,16 @@ def ofd_update(request, pk):
     else:
         form = OFDForm(instance=ofd)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/ofd/ofd_form.html', {
         'form': form,
         'computer': computer,
-        'title': f"Редактировать {ofd.reg_number}"
+        'title': f"Редактировать {ofd.reg_number}",
+        'profile': profile
     })
 
 @role_required(admin, bookkeeper)
@@ -1774,9 +2409,15 @@ def ofd_delete(request, pk):
     if request.method == 'POST':
         ofd.delete()
         return redirect(reverse('ofd-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/ofd/ofd_confirm_delete.html', {
-        'object': ofd
+        'object': ofd,
+        'profile': profile
     })
 
 
@@ -1785,13 +2426,29 @@ def ofd_delete(request, pk):
 @login_required
 def mobile_operator_list(request):
     operators = MobileOperator.objects.all().order_by('operator', 'phone_number')
-    return render(request, 'licen/mobile_operator/mobile_operator_list.html', {'operators': operators})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/mobile_operator/mobile_operator_list.html', {
+        'operators': operators,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
 def mobile_operator_detail(request, pk):
     operator = get_object_or_404(MobileOperator, pk=pk)
-    return render(request, 'licen/mobile_operator/mobile_operator_detail.html', {'operator': operator})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/mobile_operator/mobile_operator_detail.html', {
+        'operator': operator,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
@@ -1804,9 +2461,15 @@ def mobile_operator_create(request):
     else:
         form = MobileOperatorForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mobile_operator/mobile_operator_form.html', {
         'form': form,
-        'title': 'Добавить мобильного оператора'
+        'title': 'Добавить мобильного оператора',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1822,10 +2485,16 @@ def mobile_operator_update(request, pk):
     else:
         form = MobileOperatorForm(instance=operator)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/mobile_operator/mobile_operator_form.html', {
         'form': form,
         'title': f"Редактировать {operator}",
-        'address': operator.address
+        'address': operator.address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1836,9 +2505,15 @@ def mobile_operator_delete(request, pk):
     if request.method == 'POST':
         operator.delete()
         return redirect(reverse('mobile-operator-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/mobile_operator/mobile_operator_confirm_delete.html', {
-        'object': operator
+        'object': operator,
+        'profile': profile
     })
 
 
@@ -1847,13 +2522,30 @@ def mobile_operator_delete(request, pk):
 @login_required
 def internet_provider_list(request):
     providers = InternetProvider.objects.all().order_by('provider', 'address')
-    return render(request, 'licen/internet_provider/internet_provider_list.html', {'providers': providers})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/internet_provider/internet_provider_list.html', {
+        'providers': providers,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
 def internet_provider_detail(request, pk):
     provider = get_object_or_404(InternetProvider, pk=pk)
-    return render(request, 'licen/internet_provider/internet_provider_detail.html', {'provider': provider})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/internet_provider/internet_provider_detail.html', {
+        'provider': provider,
+        'profile': profile
+        })
 
 @role_required(admin)
 @login_required
@@ -1866,9 +2558,15 @@ def internet_provider_create(request):
     else:
         form = InternetProviderForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/internet_provider/internet_provider_form.html', {
         'form': form,
-        'title': 'Добавить интернет-провайдера'
+        'title': 'Добавить интернет-провайдера',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1885,10 +2583,16 @@ def internet_provider_update(request, pk):
     else:
         form = InternetProviderForm(instance=provider)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/internet_provider/internet_provider_form.html', {
         'form': form,
         'title': f"Редактировать {provider.provider} ({provider.speed})",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1899,9 +2603,15 @@ def internet_provider_delete(request, pk):
     if request.method == 'POST':
         provider.delete()
         return redirect(reverse('internet-provider-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/internet_provider/internet_provider_confirm_delete.html', {
-        'object': provider
+        'object': provider,
+        'profile': profile
     })
 
 
@@ -1910,13 +2620,29 @@ def internet_provider_delete(request, pk):
 @login_required
 def wifi_list(request):
     wifis = WiFi.objects.all().order_by('name')
-    return render(request, 'licen/wifi/wifi_list.html', {'wifis': wifis})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/wifi/wifi_list.html', {
+        'wifis': wifis,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
 def wifi_detail(request, pk):
     wifi = get_object_or_404(WiFi, pk=pk)
-    return render(request, 'licen/wifi/wifi_detail.html', {'wifi': wifi})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/wifi/wifi_detail.html', {
+        'wifi': wifi,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
@@ -1929,9 +2655,15 @@ def wifi_create(request):
     else:
         form = WiFiForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/wifi/wifi_form.html', {
         'form': form,
-        'title': 'Добавить WiFi'
+        'title': 'Добавить WiFi',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1948,10 +2680,16 @@ def wifi_update(request, pk):
     else:
         form = WiFiForm(instance=wifi)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/wifi/wifi_form.html', {
         'form': form,
         'title': f"Редактировать {wifi.name}",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -1962,9 +2700,15 @@ def wifi_delete(request, pk):
     if request.method == 'POST':
         wifi.delete()
         return redirect(reverse('wifi-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/wifi/wifi_confirm_delete.html', {
-        'object': wifi
+        'object': wifi,
+        'profile': profile
     })
 
 
@@ -1973,13 +2717,30 @@ def wifi_delete(request, pk):
 @login_required
 def router_admin_panel_list(request):
     panels = RouterAdminPanel.objects.all().order_by('address', 'name')
-    return render(request, 'licen/router_admin_panel/router_admin_panel_list.html', {'panels': panels})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/router_admin_panel/router_admin_panel_list.html', {
+        'panels': panels,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
 def router_admin_panel_detail(request, pk):
     panel = get_object_or_404(RouterAdminPanel, pk=pk)
-    return render(request, 'licen/router_admin_panel/router_admin_panel_detail.html', {'panel': panel})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/router_admin_panel/router_admin_panel_detail.html', {
+        'panel': panel,
+        'profile': profile
+        })
 
 @role_required(admin)
 @login_required
@@ -1992,9 +2753,15 @@ def router_admin_panel_create(request):
     else:
         form = RouterAdminPanelForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/router_admin_panel/router_admin_panel_form.html', {
         'form': form,
-        'title': 'Добавить панель роутера'
+        'title': 'Добавить панель роутера',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2011,10 +2778,16 @@ def router_admin_panel_update(request, pk):
     else:
         form = RouterAdminPanelForm(instance=panel)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/router_admin_panel/router_admin_panel_form.html', {
         'form': form,
         'title': f"Редактировать {panel.name}",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2025,9 +2798,15 @@ def router_admin_panel_delete(request, pk):
     if request.method == 'POST':
         panel.delete()
         return redirect(reverse('router-admin-panel-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/router_admin_panel/router_admin_panel_confirm_delete.html', {
-        'object': panel
+        'object': panel,
+        'profile': profile
     })
 
 
@@ -2036,13 +2815,30 @@ def router_admin_panel_delete(request, pk):
 @login_required
 def personal_account_internet_provider_list(request):
     accounts = PersonalAccountInternetProvider.objects.all().order_by('internet_provider', 'login')
-    return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_list.html', {'accounts': accounts})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_list.html', {
+        'accounts': accounts,
+        'profile': profile
+        })
 
 @role_required(admin)
 @login_required
 def personal_account_internet_provider_detail(request, pk):
     account = get_object_or_404(PersonalAccountInternetProvider, pk=pk)
-    return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_detail.html', {'account': account})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_detail.html', {
+        'account': account,
+        'profile': profile})
 
 @role_required(admin)
 @login_required
@@ -2055,9 +2851,15 @@ def personal_account_internet_provider_create(request):
     else:
         form = PersonalAccountInternetProviderForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_form.html', {
         'form': form,
-        'title': 'Добавить личный кабинет интернет-провайдера'
+        'title': 'Добавить личный кабинет интернет-провайдера',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2074,10 +2876,16 @@ def personal_account_internet_provider_update(request, pk):
     else:
         form = PersonalAccountInternetProviderForm(instance=account)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_internet_provider/personal_account_internet_provider_form.html', {
         'form': form,
         'title': f"Редактировать {account.login} ({account.ip_address})",
-        'address': address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2088,9 +2896,15 @@ def personal_account_internet_provider_delete(request, pk):
     if request.method == 'POST':
         account.delete()
         return redirect(reverse('personal-account-internet-provider-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/personal_account_internet_provider_confirm/personal_account_internet_provider_delete.html', {
-        'object': account
+        'object': account,
+        'profile': profile
     })
 
 
@@ -2099,13 +2913,31 @@ def personal_account_internet_provider_delete(request, pk):
 @login_required
 def personal_account_mobile_operator_list(request):
     accounts = PersonalAccountMobileOperator.objects.all().order_by('mobile_operator', 'login')
-    return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_list.html', {'accounts': accounts})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_list.html', {
+        'accounts': accounts,
+        'profile': profile
+        })
 
 @role_required(admin)
 @login_required
 def personal_account_mobile_operator_detail(request, pk):
     account = get_object_or_404(PersonalAccountMobileOperator, pk=pk)
-    return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_detail.html', {'account': account})
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_detail.html', {
+        'account': account, 
+        'profile': profile
+        })
 
 @role_required(admin)
 @login_required
@@ -2118,9 +2950,15 @@ def personal_account_mobile_operator_create(request):
     else:
         form = PersonalAccountMobileOperatorForm()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_form.html', {
         'form': form,
-        'title': 'Добавить личный кабинет мобильного оператора'
+        'title': 'Добавить личный кабинет мобильного оператора',
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2137,10 +2975,16 @@ def personal_account_mobile_operator_update(request, pk):
     else:
         form = PersonalAccountMobileOperatorForm(instance=account)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_form.html', {
         'form': form,
         'title': f"Редактировать {account.login} ({account.mobile_operator})",
-        'address': address  # ← Важно: передаём address
+        'address': address,
+        'profile': profile
     })
 
 @role_required(admin)
@@ -2151,9 +2995,15 @@ def personal_account_mobile_operator_delete(request, pk):
     if request.method == 'POST':
         account.delete()
         return redirect(reverse('personal-account-mobile-operator-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/personal_account_mobile_operator/personal_account_mobile_operator_confirm_delete.html', {
-        'object': account
+        'object': account,
+        'profile': profile
     })
 
 
@@ -2174,9 +3024,15 @@ def license_list(request, license_type=None):
                 'id': obj.id  # ← убедись, что id не None или ''
             })
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     context = {
         'licenses': all_licenses,
-        'title': 'Все лицензии'
+        'title': 'Все лицензии',
+        'profile': profile
     }
     return render(request, 'licen/license_list.html', context)
    
@@ -2203,6 +3059,11 @@ def license_detail(request, license_type, license_id):
     network = getattr(obj, 'network', None)
     city = getattr(obj, 'city', None)
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     context = {
         'object': obj,
         'computer': computer,  # ← теперь это объект, а не строка
@@ -2210,7 +3071,8 @@ def license_detail(request, license_type, license_id):
         'legal_entity': legal_entity,
         'network': network,
         'city': city,
-        'title': f"{obj._meta.verbose_name} #{obj.id}"
+        'title': f"{obj._meta.verbose_name} #{obj.id}",
+        'profile': profile
     }
     return render(request, 'licen/license_detail.html', context)
 
@@ -2232,13 +3094,19 @@ def license_delete(request, license_type, license_id):
     if request.method == 'POST':
         obj.delete()
         return HttpResponseRedirect(reverse('license-list'))
+    
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
 
     return render(request, 'licen/license_confirm_delete.html', {
         'object': obj,
-        'title': f'Удалить уведомление #{obj.id}'
+        'title': f'Удалить уведомление #{obj.id}',
+        'profile': profile
     })
 
-@role_required(admin, bookkeeper)
+@role_required(admin)
 @login_required
 def license_create(request, license_type):
     from licen.models import LicenseBaseModel
@@ -2264,46 +3132,49 @@ def license_create(request, license_type):
     else:
         form = form_class()
 
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/license_form.html', {
         'form': form,
-        'title': f"Добавить {model_class._meta.verbose_name}"
+        'title': f"Добавить {model_class._meta.verbose_name}",
+        'profile': profile
     })
 
 @login_required
 def dashboard(request):
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     context = {
         'total_licenses': LicenseNotification.objects.count(),
         'expired_count': LicenseNotification.objects.filter(notification_type='expired').count(),
         'expiring_soon_30': LicenseNotification.objects.filter(notification_type='expiring_soon_30'),
         'expiring_soon_7': LicenseNotification.objects.filter(notification_type='expiring_soon_7'),
-        'expiring_soon_1': LicenseNotification.objects.filter(notification_type='expiring_soon_1'),
+        'expiring_soon_5': LicenseNotification.objects.filter(notification_type='expiring_soon_5'),
         'notifications': LicenseNotification.objects.filter(is_sent=False).order_by('-expiration_date')[:5],
-        'title': 'Дашборд',
+        'profile': profile,
+        'title': 'Главная',
     }
     return render(request, 'licen/dashboard.html', context)
 
 @login_required
+@role_required(admin, bookkeeper)
 def license_select_type(request):
+
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        profile = None
+
     return render(request, 'licen/license_select_type.html', {
-        'title': 'Выберите тип лицензии'
+        'title': 'Выберите тип лицензии',
+        'profile': profile
     })
-
-# ====== Юрлица ======
-
-class LegalEntityCreateView(CreateView):
-    model = LegalEntity
-    form_class = LegalEntityForm
-    template_name = 'licen/legalentity_form.html'
-
-    def get_initial(self):
-        initial = super().get_initial()
-        city_id = self.kwargs.get('city_id')
-        if city_id:
-            initial['city'] = city_id
-        return initial
-
-    def get_success_url(self):
-        return reverse('city-detail', kwargs={'pk': self.object.city.pk})
 
 # ====== Уведомления ======
 

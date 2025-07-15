@@ -30,6 +30,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        {% if profile.role == 'admin' %}
                         <div class="col-md-6 col-xxl-12">
                             <a href="{% url 'license-select-type' %}" class="card action-card h-100 text-decoration-none">
                                 <div class="card-body text-center">
@@ -40,6 +41,7 @@
                                 </div>
                             </a>
                         </div>
+                        {% endif %}
                         <div class="col-md-6 col-xxl-12">
                             <a href="{% url 'license-list' %}" class="card action-card h-100 text-decoration-none">
                                 <div class="card-body text-center">
@@ -211,14 +213,14 @@
         <div class="col-md-4">
             <div class="card border-primary border-2 h-100">
                 <div class="card-header bg-primary-light border-0 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold">1 день до истечения</h6>
-                    <span class="badge bg-primary rounded-pill">{{ expiring_soon_1|length }}</span>
+                    <h6 class="mb-0 fw-bold">5 день до истечения</h6>
+                    <span class="badge bg-primary rounded-pill">{{ expiring_soon_5|length }}</span>
                 </div>
                 <div class="card-body p-0">
-                    {% include "licen/_notifications_list.html" with notifications=expiring_soon_1 %}
+                    {% include "licen/_notifications_list.html" with notifications=expiring_soon_5 %}
                 </div>
                 <div class="card-footer bg-white border-0 text-center">
-                    <a href="{% url 'license-list' %}?filter=expiring_1" class="btn btn-sm btn-outline-primary">Показать все</a>
+                    <a href="{% url 'license-list' %}?filter=expiring_5" class="btn btn-sm btn-outline-primary">Показать все</a>
                 </div>
             </div>
         </div>
@@ -235,7 +237,7 @@
         const licenseChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Активные', 'Истёкшие', 'Истекают через 30 дней', 'Истекают через 7 дней'],
+                labels: ['Истекают через 5 дней', 'Истёкшие', 'Истекают через 30 дней', 'Истекают через 7 дней'],
                 datasets: [{
                     data: [
                         {{ total_licenses|default:0 }} - {{ expired_count|default:0 }} - {{ expiring_soon_30|length|default:0 }} - {{ expiring_soon_7|length|default:0 }},

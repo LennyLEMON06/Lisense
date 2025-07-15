@@ -17,8 +17,6 @@ from .views import (
     contact_person_update,
     contact_person_delete,
 
-    LegalEntityCreateView,
-
     ChangePasswordView,
 
     login_view,
@@ -210,9 +208,6 @@ urlpatterns = [
     path('password-reset/', password_reset_request, name='password_reset'),
     path('password-reset-confirm/<uidb64>/<token>/', password_reset_confirm, name='password_reset_confirm'),
     path('password-reset-done/', password_reset_done, name='password_reset_done'),
-
-    # Юрлица
-    path('cities/<int:city_id>/add_legal_entity/', LegalEntityCreateView.as_view(), name='legal-entity-create'),
 
     # Города
     path('cities/', city_list, name='city-list'),

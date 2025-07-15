@@ -1,7 +1,7 @@
 <!-- licen/templates/licen/address/address_detail.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <h2 class="mb-4">Детали адреса</h2>
 
     <!-- Карточка с деталями адреса -->
@@ -43,8 +43,10 @@
 
     <!-- Кнопки управления -->
     <div class="d-flex flex-wrap gap-3 mb-5">
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'address-update' address.id %}" class="btn btn-warning">Редактировать</a>
         <a href="{% url 'address-delete' address.id %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
         <a href="{% url 'address-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 
@@ -52,7 +54,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Компьютеры</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'computer-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if computers %}
@@ -77,8 +81,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -106,8 +112,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'computer-detail' computer.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'computer-update' computer.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'computer-delete' computer.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -124,7 +132,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>WiFi сети</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'wifi-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if wifis %}
@@ -147,8 +157,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -173,8 +185,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'wifi-detail' wifi.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'wifi-update' wifi.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'wifi-delete' wifi.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -191,7 +205,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Доступ к админ-панели роутера</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'router-admin-panel-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if router_admin_panels %}
@@ -216,8 +232,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'router-admin-panel-detail' router.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'router-admin-panel-update' router.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'router-admin-panel-delete' router.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -245,8 +263,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'router-admin-panel-detail' router.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'router-admin-panel-update' router.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'router-admin-panel-delete' router.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -263,7 +283,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Мобильные операторы</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'mobile-operator-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if mobile_operators %}
@@ -288,8 +310,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'mobile-operator-detail' operator.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'mobile-operator-update' operator.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'mobile-operator-delete' operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -317,8 +341,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'mobile-operator-detail' operator.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'mobile-operator-update' operator.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'mobile-operator-delete' operator.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -335,7 +361,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Личный кабинет мобильного оператора</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'personal-account-mobile-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if personal_accounts_mobile %}
@@ -358,8 +386,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'personal-account-mobile-operator-detail' account.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'personal-account-mobile-operator-update' account.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'personal-account-mobile-operator-delete' account.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -384,8 +414,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'personal-account-mobile-operator-detail' account.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'personal-account-mobile-operator-update' account.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'personal-account-mobile-operator-delete' account.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -402,7 +434,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Интернет-провайдеры</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'internet-provider-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if internet_providers %}
@@ -425,8 +459,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'internet-provider-detail' provider.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'internet-provider-update' provider.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'internet-provider-delete' provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -451,8 +487,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'internet-provider-detail' provider.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'internet-provider-update' provider.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'internet-provider-delete' provider.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -469,7 +507,9 @@
     <div class="section-block mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Личный кабинет интернет-провайдера</h4>
+            {% if profile.role == 'admin' or profile.role == 'journalist'%}
             <a href="{% url 'personal-account-internet-create-for-address' address.id %}" class="btn btn-success btn-sm">+ Добавить</a>
+            {% endif %}
         </div>
         
         {% if personal_accounts_internet %}
@@ -492,8 +532,10 @@
                             <td class="text-nowrap">
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'personal-account-internet-provider-detail' account.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                                     <a href="{% url 'personal-account-internet-provider-update' account.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                                     <a href="{% url 'personal-account-internet-provider-delete' account.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -518,8 +560,10 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{% url 'personal-account-internet-provider-detail' account.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'personal-account-internet-provider-update' account.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'personal-account-internet-provider-delete' account.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

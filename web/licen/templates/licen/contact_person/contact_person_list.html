@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Почты сотрудников</h2>
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'contact-person-create' %}" class="btn btn-primary d-flex align-items-center gap-2">
             <i class="bi bi-plus-lg"></i> Добавить
         </a>
+        {% endif %}
     </div>
 
     {% if persons %}
@@ -34,8 +36,10 @@
                     <td>{{ person.phone_number }}</td>
                     <td class="text-nowrap">
                         <a href="{% url 'contact-person-detail' person.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        {% if profile.role == 'admin' or profile.role == 'journalist'%}
                         <a href="{% url 'contact-person-update' person.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'contact-person-delete' person.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -64,8 +68,10 @@
                     </p>
                     <td class="text-nowrap">
                         <a href="{% url 'contact-person-detail' person.id %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i></a>
+                        {% if profile.role == 'admin' or profile.role == 'journalist'%}
                         <a href="{% url 'contact-person-update' person.id %}" class="btn btn-sm btn-outline-warning me-1"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'contact-person-delete' person.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        {% endif %}
                     </td>
                 </div>
             </div>

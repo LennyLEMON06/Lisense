@@ -111,9 +111,11 @@
                         </div>
                     </div>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'license-select-type' %}" class="btn btn-primary">
-                            <i class="ri-add-line me-2"></i>Добавить лицензию
-                        </a>
+                        {% if profile.role == 'admin' %}
+                            <a href="{% url 'license-select-type' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-2"></i>Добавить лицензию
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -181,9 +183,12 @@
                                             <a href="{% url 'license-detail' item.type item.id %}" class="btn btn-sm btn-outline-info me-1" title="Просмотр">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{% url 'license-delete' item.type item.id %}" class="btn btn-sm btn-outline-danger" title="Удалить">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+
+                                            {% if profile.role == 'admin' %}
+                                                <a href="{% url 'license-delete' item.type item.id %}" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

@@ -1,7 +1,7 @@
 <!-- licen/templates/licen/network_detail.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <h2 class="mb-4">Детали юридического лица</h2>
     
     <div class="card mb-4">
@@ -42,15 +42,19 @@
 
     <!-- Кнопки управления -->
     <div class="d-flex flex-wrap gap-3 mb-4">
+        {% if profile.role == 'admin' or profile.role == 'journalist'%}
         <a href="{% url 'network-update' network.id %}" class="btn btn-warning">Редактировать</a>
         <a href="{% url 'network-delete' network.id %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
         <a href="{% url 'network-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
 
     <!-- Кнопка добавления адреса -->
+     {% if profile.role == 'admin' or profile.role == 'journalist'%}
     <div class="mb-4">
         <a href="{% url 'address-create-for-network' network.id %}" class="btn btn-success">+ Добавить адрес</a>
     </div>
+    {% endif %}
 
     <!-- Таблица с адресами -->
     {% if addresses %}
@@ -77,8 +81,10 @@
                     <td class="text-nowrap">
                         <div class="d-flex gap-2">
                             <a href="{% url 'address-detail' address.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            {% if profile.role == 'admin' or profile.role == 'journalist'%}
                             <a href="{% url 'address-update' address.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'address-delete' address.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
@@ -103,8 +109,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{% url 'address-detail' address.id %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                    {% if profile.role == 'admin' or profile.role == 'journalist'%}
                     <a href="{% url 'address-update' address.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
                     <a href="{% url 'address-delete' address.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                    {% endif %}
                 </div>
             </div>
         </div>

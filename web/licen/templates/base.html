@@ -28,6 +28,11 @@
 
   {% block css %}
     <style>
+       body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+            }
       /* Стили для боковой панели */
       .sidebar {
         position: fixed;
@@ -411,6 +416,26 @@
     background-color: #3d3d4d;
   }
 }
+
+/* Стили для подвала */
+.footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .footer {
+  background-color: #2b2b3d !important;
+  border-top-color: #444 !important;
+}
+
+.main-content {
+  min-height: calc(100vh - 180px); /* Учитываем высоту подвала и навбара */
+  padding-bottom: 20px;
+}
     </style>
   {% endblock %}
 </head>
@@ -451,10 +476,15 @@
               <i class="bi bi-moon theme-icon"></i> <!-- или bi-sun при dark mode -->
           </button>
       </li> {% endcomment %}
-      <li class="nav-item me-2 me-lg-3">
+      <li class="nav-item me-2 me-lg-1">
         <a class="nav-link position-relative" href="{% url 'license-list' %}">
           <i class="bi bi-bell-fill"></i>
         </a>
+      </li>
+      <li class="nav-item me-3 me-lg-0 d-none d-md-block">
+        <span class="nav-link fw-semibold text-dark mb-0">
+            Вы вошли как {{ user.username }}
+        </span>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -556,6 +586,7 @@
           <i class="bi bi-cloud-arrow-up-fill"></i> OFD
         </a>
       </li>
+      {% if profile.role == 'admin' or profile.role == 'journalist'%}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'mobile-operator-list' %}">
           <i class="bi bi-phone-vibrate-fill"></i> Мобильные операторы
@@ -571,6 +602,8 @@
           <i class="bi bi-wifi"></i> Wi-fi
         </a>
       </li>
+      {% endif %}
+      {% if profile.role == 'admin'%}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'router-admin-panel-list' %}">
           <i class="bi bi-router-fill"></i>  Роутер AdminPanel
@@ -586,6 +619,7 @@
           <i class="bi bi-router"></i>  PersonalAccount интернет провайдеров
         </a>
       </li>
+      {% endif %}
     </ul>
   </div>
 </div>
@@ -593,7 +627,7 @@
 <div class="main-content">
   {% block breadcrumbs %}
     {% if breadcrumbs %}
-    <div class="container mt-5 pt-4">
+    <div class="container mt-4">
         {% comment %} <nav aria-label="breadcrumb">
             <ul class="breadcrumb">
                 {% for crumb in breadcrumbs %}
@@ -615,6 +649,19 @@
   <p>Это основной контент страницы.</p>
   {% endblock %}
 </div>
+
+<footer class="footer mt-auto py-3 {% if request.session.theme == 'dark' %}bg-dark{% else %}bg-light{% endif %}">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-center text-md-start">
+        <span class="text-muted">© {% now "Y" %} LICENSE. Все права защищены.</span>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <span class="text-muted">Версия: 1.0.0</span>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <!-- Bootstrap JS и Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> 

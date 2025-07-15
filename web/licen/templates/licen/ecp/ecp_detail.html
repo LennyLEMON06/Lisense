@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали лицензии ЭЦП</h2>
     <dl class="row">
         <dt class="col-sm-3">ID:</dt>
@@ -24,8 +24,10 @@
         <dd class="col-sm-9">{{ ecp.comments }}</dd>
     </dl>
 
+    {% if profile.role == 'admin' or profile.role == 'journalist'%}
     <a href="{% url 'ecp-update' ecp.id %}" class="btn btn-warning">Редактировать</a>
     <a href="{% url 'ecp-delete' ecp.id %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="{% url 'ecp-list' %}" class="btn btn-secondary">Назад к списку</a>
 </div>
 {% endblock %}

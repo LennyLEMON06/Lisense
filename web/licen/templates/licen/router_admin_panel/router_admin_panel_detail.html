@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container">
     <h2>Детали панели роутера</h2>
     <dl class="row">
         <dt class="col-sm-3">ID:</dt>
@@ -27,8 +27,10 @@
         <dd class="col-sm-9">{{ panel.comments }}</dd>
     </dl>
 
+    {% if profile.role == 'admin'%}
     <a href="{% url 'router-admin-panel-update' panel.id %}" class="btn btn-warning">Редактировать</a>
     <a href="{% url 'router-admin-panel-delete' panel.id %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="{% url 'router-admin-panel-list' %}" class="btn btn-secondary">Назад к списку</a>
 </div>
 {% endblock %}
