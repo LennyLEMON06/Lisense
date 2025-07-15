@@ -188,12 +188,18 @@ from .views import (
     personal_account_mobile_operator_create,
     personal_account_mobile_operator_update,
     personal_account_mobile_operator_delete,
+
+    registration_pending_view,
+    wait_for_approval_view,
 )
 
 urlpatterns = [
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),
     path('logout/', custom_logout, name='logout'),
+
+    path('registration-pending/', registration_pending_view, name='registration_pending'),
+    path('wait-for-approval/', wait_for_approval_view, name='wait_for_approval'),
 
     path('search/', search_results, name='search-results'),
 

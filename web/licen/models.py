@@ -745,6 +745,7 @@ class UserProfile(TimestampModel):
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.JOURNALIST, verbose_name=_('Роль пользователя'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Телефон'))
     department = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Отдел'))
+    is_approved = models.BooleanField(default=False)  # флаг одобрения администратором
 
     def __str__(self):
         return f"{self.user.username} ({self.role})"

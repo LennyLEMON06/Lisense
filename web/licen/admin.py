@@ -377,7 +377,8 @@ class LicenseNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'role')
+    list_display = ('user', 'role', 'is_approved')
+    list_editable = ('is_approved',)
     list_filter = ('role',)
     search_fields = ('user__username',)
     raw_id_fields = ('user',)
@@ -390,6 +391,9 @@ class UserProfileAdmin(admin.ModelAdmin):
         }),
         (_('Роль'), {
             'fields': ('role',)
+        }),
+        (_('Доступ'), {
+            'fields': ('is_approved',)
         }),
     )
     verbose_name = _('Профиль пользователя')

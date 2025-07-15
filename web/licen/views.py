@@ -32,9 +32,15 @@ bookkeeper = UserProfile.Role.MODERATOR
 user = UserProfile.Role.JOURNALIST
 
 def login_view(request):
-    # ✅ Если пользователь уже авторизован — сразу редирект
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        try:
+            profile = request.user.profile
+            if profile.is_approved and request.user.is_active:
+                return redirect('dashboard')
+            else:
+                return redirect('wait_for_approval')  # ← Редирект, а не рендер
+        except UserProfile.DoesNotExist:
+            return redirect('wait_for_approval')
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -42,27 +48,56 @@ def login_view(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
+
             if user is not None:
+                try:
+                    profile = user.profile
+                    if not profile.is_approved or not user.is_active:
+                        return redirect('wait_for_approval')
+                except UserProfile.DoesNotExist:
+                    return redirect('wait_for_approval')
+
                 login(request, user)
-                return redirect('dashboard')  # Перенаправьте на домашнюю страницу после входа
+                return redirect('dashboard')
     else:
         form = AuthenticationForm()
+
     return render(request, 'licen/log/login.html', {'form': form})
 
 def register_view(request):
-    # ✅ Если пользователь уже авторизован — сразу редирект
     if request.user.is_authenticated:
         return redirect('dashboard')
 
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Перенаправление на страницу входа после успешной регистрации
+            user = form.save(commit=False)
+            user.is_active = False  # Деактивируем аккаунт
+            user.save()
+            # Создаем профиль через сигнал или вручную
+            return redirect('registration_pending')  # Перенаправление на страницу ожидания
     else:
         form = RegisterForm()
 
     return render(request, 'licen/log/register.html', {'form': form})
+
+def registration_pending_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'licen/log/registration_pending.html')
+
+def wait_for_approval_view(request):
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            if profile.is_approved and request.user.is_active:
+                return redirect('dashboard')
+        except UserProfile.DoesNotExist:
+            return redirect('dashboard')
+    else:
+        return redirect('login')
+
+    return render(request, 'licen/log/wait_for_approval.html')
 
 def custom_logout(request):
     logout(request)
